@@ -1,74 +1,114 @@
 # rust-universe-map
 
-**저장된 우주가 아니라, 계산되는 우주 지도.**
-A map of the universe that is computed, not stored. (English summary at the bottom.)
+**A map of the universe that is computed, not stored.**
 
-![우리 은하에서 안드로메다의 별로 들어가는 우주선](docs/milky-way-to-andromeda.gif)
+![A ship leaving the Milky Way and entering a star of Andromeda](docs/milky-way-to-andromeda.gif)
 
-*안드로메다 은하로 들어가 그 안의 별에 도착하기까지 (29초, [MP4](docs/milky-way-to-andromeda.mp4)). 가까워지면서 보이는 점들은 그 자리에서 계산된 안드로메다의 별입니다.*
+*Into the Andromeda galaxy and on to one of its stars (29 s, [MP4](docs/milky-way-to-andromeda.mp4)). The points that appear on the way in are Andromeda's stars, computed on the spot.*
 
-![우리 은하 밖에서 지구로 돌아오는 우주선](docs/outside-milky-way-to-earth.gif)
+![A ship coming back to the Earth from outside the Milky Way](docs/outside-milky-way-to-earth.gif)
 
-*우리 은하 밖에서 지구까지 (1분, [MP4](docs/outside-milky-way-to-earth.mp4)).*
+*From outside the Milky Way to the Earth (1 min, [MP4](docs/outside-milky-way-to-earth.mp4)).*
 
-![지구를 떠나 목성으로 가는 우주선](docs/earth-to-jupiter.gif)
+![A ship leaving the Earth for Jupiter](docs/earth-to-jupiter.gif)
 
-*지구를 떠나 목성에 도착하기까지 (1분, [MP4](docs/earth-to-jupiter.mp4)). 행성의 위치는 그 날짜의 실제 위치(VSOP87)입니다.*
+*From the Earth to Jupiter (1 min, [MP4](docs/earth-to-jupiter.mp4)). The planets are where they really are on that date (VSOP87).*
 
-![안드로메다 은하 중심의 별에 도착한 우주선](docs/arrival-andromeda.jpg)
+![A ship arrived at a star at the centre of Andromeda](docs/arrival-andromeda.jpg)
 
-*안드로메다 은하 1번 별(`Andromeda Galaxy/1`, 254만 광년)에 도착한 모습. 배경은 사진이 아니라 안드로메다의 계산된 별들이고, 우주선을 비추는 푸른 빛은 그 B9형 별의 빛입니다.*
+*Arrived at star 1 of Andromeda (`Andromeda Galaxy/1`, 2.54 million light years). The background is not a photograph: it is Andromeda's computed stars, and the blue light on the ship is the light of that B9 star.*
 
-> 위 영상과 그림의 우주선, 행성 그림, 3인칭 카메라는 이 지도를 쓰는 별도의 게임에서 찍은 것입니다.
-> 이 저장소에는 **지도만** 있습니다. 게임 엔진, 렌더러, 우주선 모델은 들어 있지 않습니다.
+> The ship, the planets' pictures and the third-person camera in these clips belong to a separate game that uses this map.
+> This repository holds **the map only**. There is no game engine, no renderer and no ship model here.
 
-## 이것이 무엇인가
+## What this is
 
-안드로메다 은하는 여기서 그림 한 장이 아닙니다. **7,500억 개의 항성계**, 동반성까지 세면 약 1조 개의 별로 이루어져 있고, 별마다 주소가 있습니다. 그런데 그 별들은 어디에도 저장되어 있지 않습니다.
+Andromeda is not one picture here. It is **750 billion star systems**, about a trillion stars with their companions, and every star has an address. None of those stars is stored anywhere.
 
-- 은하의 모양은 수식과 작은 행렬로 적혀 있습니다 (은하 하나에 숫자 약 4 KB).
-- 우리 은하, 안드로메다를 비롯한 은하 18개는 수식이 아니라 **X, Y, Z 세 축에서 본 그림 세 장**으로 적혀 있습니다. 세 그림이 겹치는 곳의 밝기가 그 자리의 별의 밀도입니다 (안드로메다는 그림 약 2 MB, 빛과 먼지 격자까지 합쳐 약 7.5 MB).
-- 별은 **주소에서 계산됩니다.** `Andromeda Galaxy/123456789012/2`는 안드로메다의 123,456,789,012번째 별의 두 번째 행성이고, 누가 어느 컴퓨터에서 계산해도 같은 별, 같은 행성이 나옵니다.
-- 별의 종류, 동반성, 행성의 개수와 크기와 궤도는 실제 관측 통계를 따릅니다 (출처는 [`map/SOURCES.md`](map/SOURCES.md)).
+- A galaxy's shape is a formula and a few small matrices (about 4 KB of numbers a galaxy).
+- Eighteen galaxies, the Milky Way and Andromeda among them, are not formulas but **three pictures, one seen along each of the axes X, Y and Z**. Where the three pictures overlap, their brightness is the density of stars there (Andromeda: about 2 MB of pictures, about 7.5 MB with its grids of light and dust).
+- A star is **computed from its address**. `Andromeda Galaxy/123456789012/2` is the second planet of the 123,456,789,012th star of Andromeda, and it is the same star and the same planet whoever computes it, on whatever machine.
+- The kinds of stars, their companions, and the number, sizes and orbits of their planets follow the statistics of real surveys (sources in [`map/SOURCES.md`](map/SOURCES.md)).
 
-| | 값 |
+| | |
 |---|---|
-| 별을 가진 은하 | 94개 (세 그림으로 적힌 은하 18개, 나머지는 수식) |
-| 항성계 전체 | 약 1.15 × 10¹³ 개 |
-| 우리 은하 | 2,695억 항성계 (별 약 3,650억 개) |
-| 안드로메다 | 7,500억 항성계 (별 약 1조 개) |
-| 지도 전체 용량 | 251 MB (그중 81 MB는 지구 고도, 42 MB는 지구 하늘을 맞추는 격자) |
-| 안드로메다에 쓰인 용량 | 약 7.5 MB |
-| 별 하나를 주소에서 계산하는 시간 | 0.006 ms ~ 약 1 ms |
+| Galaxies with stars of their own | 94 (18 as three pictures, the rest as formulas) |
+| Galaxies that can be made from their code | 327,835 (the SDSS DR12 list, see below) |
+| Star systems in all | about 1.15 × 10¹³ |
+| The Milky Way | 269.5 billion star systems (about 365 billion stars) |
+| Andromeda | 750 billion star systems (about a trillion stars) |
+| The whole map | 251 MB (81 MB of it is the Earth's heights, 42 MB the grids that match the Earth's sky) |
+| Andromeda's share | about 7.5 MB |
+| Computing one star from its address | 0.006 ms to about 1 ms |
 
-안드로메다의 별 1조 개를 별마다 20바이트로 저장했다면 약 20 TB가 필요합니다. 여기서는 7.5 MB입니다.
+A trillion stars of Andromeda at 20 bytes a star would be about 20 TB. Here it is 7.5 MB.
 
-## 이 프로젝트가 어떻게 시작되었나
+## A galaxy as a code: the "latent vector"
 
-저는 천문학을 모릅니다. 이 지도는 인터넷에 공개되어 있는 [Gaia Sky](https://codeberg.org/gaiasky/gaiasky)의 소스와 데이터에서 출발했습니다. 거기 있는 은하 사진들을 계산해서 은하마다 수식(밝기 분포, 나선팔, 먼지 띠, 두께)을 만들었고, 그 수식에서 별을 만들었습니다.
+A generative model does not keep its pictures. It keeps a short list of numbers, a latent vector, and decodes a picture from it when asked. This map treats the galaxies it has not visited the same way, and that is why it stays between 200 and 300 MB.
 
-그래서 이 지도에는 틀린 곳이 많을 것입니다. 저 혼자서는 그것을 알아볼 수도 고칠 수도 없습니다. 천문학을 아는 사람, 데이터를 다루는 사람, 코드를 쓰는 사람이 서로 도와서 **정말로 우주의 지도라고 부를 수 있는 것**을 함께 만들고 싶어서 공개합니다. 고칠 곳을 알려 주시는 것만으로도 큰 도움이 됩니다.
+A galaxy that nobody has gone to yet is **a code of a few numbers**: where it is and its redshift (what the survey measured), and what follows from its catalogue number as a seed: its kind (spiral, elliptical, irregular, giant elliptical), its size, its light, how round and how thick it is, and how it is turned in space. In the survey's file that is 36 bytes a galaxy. It is not a vector an LLM learned: the name is an analogy, and what decodes it is an image model.
 
-## 무엇이 실제이고 무엇이 계산인가
+```
+code (36 bytes)  ->  three prompts: from above, and from two sides
+                 ->  an image model draws the three views (X, Y, Z)
+                 ->  xyz_make puts them on one grid
+                 ->  the stars are computed where the three views overlap
+```
 
-정직하게 나누면 이렇습니다.
+**How many galaxies.** Today the list is the SDSS DR12 catalogue that Gaia Sky distributes: **327,835 galaxies in 11.8 MB**, each one a place you can name (`SDSS 75`) and have made. Each comes out as a galaxy of its own, with its own kind, size, colours, shape and orientation, and three pictures drawn for it alone. Nothing in the method stops at that list: any galaxy with a position and a redshift can be a code, so the same map can grow toward every galaxy that has been observed. What grows is the list, not the stars: 36 bytes a galaxy means about 7 million galaxies in the size of today's map, and a catalogue of hundreds of millions would be gigabytes and would have to be shipped apart from it.
 
-| 층 | 근거 |
+**What it costs to make one.** Making a galaxy does **not** generate its hundreds of billions of stars. It asks an image model for three small pictures, once. Measured for `SDSS 75` (a spiral 347 million light years away, about 2.8 × 10¹¹ stars), with OpenAI's `gpt-image-2` at low quality:
+
+| | |
 |---|---|
-| 태양 주변 먼지 (69 pc ~ 1.25 kpc) | **측정**: Edenhofer et al. 2023 |
-| 지구의 고도 | **측정**: NOAA ETOPO 2022 |
-| 태양 근처의 별, 태양계 (선택 사항) | **측정**: Gaia DR3 등, Gaia Sky 데이터가 설치되어 있을 때만 |
-| 세 그림으로 적힌 은하 18개 (우리 은하, 안드로메다, 마젤란 은하들, M33, M51, M81, M101 등) | 세 축(X 긴 축, Y 극, Z 짧은 축)에서 본 그림 세 장. 정면 그림은 사진을 펴서 만들거나 이미지 모델이 그린 것이고, 옆에서 본 두 장은 이미지 모델이 그린 것. 사진이 있는 은하는 지구에서 본 모습이 사진과 닮도록 맞춤. 우리 은하는 밖에서 찍은 사진이 없으므로 전부 상상도 |
-| 우리 은하의 빛과 먼지 격자 | R. Hurt의 상상도(측정된 막대, 나선팔, 태양 위치로 그린 그림)에서 계산 |
-| 사진이 없는 은하 | 위치와 크기만 카탈로그의 것. 모양은 이미지 모델이 만든 그림에서 계산 |
-| 개별 별, 동반성, 행성 | **전부 계산**. 실제 별이 아니라 실제 별의 통계를 따르는 별 |
-| 블랙홀, 중성자별 등 | 은하 전체의 추정 개수에서 계산 |
+| Pictures | 3 (the view from above at 2048 px, two side views at 1024 px) |
+| Tokens the model wrote | 789 (397 + 196 + 196) |
+| Tokens in all, with the prompts and the top view given back as input | about 4,200 |
+| Time | about a minute |
+| Kept on disk afterwards | about 3.5 MB (11 MB with the model's original pictures) |
 
-다른 은하의 별은 태양 근처 별의 밝기 분포를 그대로 씁니다. 별마다 측정된 곳이 거기뿐이기 때문입니다.
+After that the galaxy costs nothing more. Its stars are computed from their addresses only around the camera, as in Andromeda, and are thrown away when you leave. What that many tokens cost in money depends on your image model and its prices at the time.
 
-## 바로 해 보기
+**What is honest to say about it.**
 
-Rust만 있으면 됩니다. 다른 데이터는 필요 없습니다.
+- The same number always gives the same code. The pictures an image model draws from a code are not the same twice, so a galaxy made once has to be kept and shared, not made again.
+- The SDSS file gives only where each galaxy is. Its kind, size and brightness are drawn from its seed in the proportions seen in the local universe (beyond redshift 0.35, giant ellipticals, as SDSS chose its targets). They are not measurements of that galaxy.
+- This crate asks no image model itself. It gives the code and the prompts and makes the galaxy from the three pictures you bring. `tools/galaxy_gpt.py` is one way to get them.
+- The SDSS list is not in this repository. It comes with Gaia Sky's data (`catalog-sdss-12`).
+
+```
+cargo run --release --example galaxy_code -- "SDSS 75"
+cargo run --release --example galaxy_code -- "SDSS 75" path/to/sdss_dr12.bin pictures/
+```
+
+The first prints the code and the three prompts. The second, given a folder with `y.png`, `x.png` and `z.png`, makes the galaxy there.
+
+## How this started
+
+I am not an astronomer. This map started from the public source and data of [Gaia Sky](https://codeberg.org/gaiasky/gaiasky). I computed a formula for each galaxy (its light profile, spiral arms, dust lanes, thickness) from the galaxy pictures found there, and made the stars from the formulas.
+
+So much of this map is surely wrong, in ways I can neither see nor fix alone. I am opening it because I would like people who know astronomy, people who work with data and people who write code to help each other make **something that deserves to be called a map of the universe**. Simply telling me what is wrong is already a great help.
+
+## What is real and what is computed
+
+| Layer | Where it comes from |
+|---|---|
+| Dust around the Sun (69 pc to 1.25 kpc) | **Measured**: Edenhofer et al. 2023 |
+| The Earth's heights | **Measured**: NOAA ETOPO 2022 |
+| Stars near the Sun, the Solar System (optional) | **Measured**: Gaia DR3 and others, only when Gaia Sky's data is installed |
+| The 18 galaxies of three pictures (the Milky Way, Andromeda, the Magellanic Clouds, M33, M51, M81, M101 and others) | Three pictures seen along three axes (X the long axis, Y the pole, Z the short axis). The face-on one is the photograph unrolled or drawn by an image model, the two side views are drawn by an image model. Where there is a photograph, the galaxy is fitted so that it looks like the photograph when seen from the Earth. There is no photograph of the Milky Way from outside, so all of it is imagined |
+| The Milky Way's grids of light and dust | Computed from R. Hurt's artist's impression (drawn from the measured bar, arms and place of the Sun) |
+| Galaxies without a photograph | Only their place and size are the catalogue's. Their shape is computed from pictures drawn by an image model |
+| Galaxies made from their code (SDSS) | Their place and redshift are the survey's. Kind, size and light are drawn from the seed, the pictures by an image model |
+| Single stars, companions, planets | **All computed**. Not real stars, but stars that follow the statistics of real ones |
+| Black holes, neutron stars and the like | Computed from estimates of how many a whole galaxy has |
+
+The stars of other galaxies use the brightness distribution of the stars near the Sun, because that is the only place where stars have been measured one by one.
+
+## Try it
+
+You need Rust and nothing else. No other data is needed for these.
 
 ```
 git clone https://github.com/you6878/rust-universe-map
@@ -88,101 +128,96 @@ Andromeda Galaxy/1  (computed in 0.007 ms)
     7: rocky planet: 4.62 Earth masses, 1.51 Earth radii, 5.539 AU from star 1, once in 8.5 years, 290 K, 1 moon
 ```
 
-## 메모리와 용량
+## Memory and size
 
-Gaia Sky 본체는 Java로 되어 있고(Python은 스크립트와 도구에 쓰입니다), 이 지도의 코드는 Rust입니다. **두 프로그램의 메모리를 나란히 재 본 적은 없으므로 "몇 % 절약"이라는 숫자는 적지 않습니다.** 아래는 이 코드에서 직접 잰 값입니다 (Apple Silicon, release 빌드).
+Gaia Sky itself is written in Java (Python is used for its scripts and tools), and this map's code is Rust. **The two programs have never been measured side by side, so no "saves so many percent" is claimed here.** These are measured with this code (Apple Silicon, release build).
 
-| 무엇을 | 메모리 |
+| What | Memory |
 |---|---|
-| 주소 하나 계산 (`examples/address`, 지도 전체를 읽음) | 최대 677 MB |
-| 지도를 쓰는 렌더러, 지구 근처 (Gaia 별 646,401개 포함) | 476 MB |
-| 같은 렌더러, 은하 중심 근처 (계산된 별 724,471개가 보이는 곳) | 1,242 MB |
+| Computing one address (`examples/address`, which reads the whole map) | 677 MB at most |
+| A renderer using the map, near the Earth (with 646,401 Gaia stars) | 476 MB |
+| The same renderer near a galaxy's centre (724,471 computed stars in view) | 1,242 MB |
 
-절약되는 것은 메모리보다 **저장 공간**입니다. 카메라 주변의 별만 그 순간 계산해서 가지고 있고, 떠나면 버립니다. 은하 전체는 메모리에도 디스크에도 없습니다. 주소 하나를 계산하는 데 677 MB가 드는 것은 지도의 격자를 모두 읽기 때문이고, 줄일 수 있는 부분입니다 (아래 "도움이 필요한 곳").
+What is saved is **storage** more than memory. Only the stars around the camera are computed and held, and they are dropped when you leave. A whole galaxy is neither in memory nor on disk. One address takes 677 MB because all the map's grids are read, which can be reduced (see "Where help is needed").
 
-## 주소
+## Addresses
 
-우편 주소처럼 큰 곳에서 작은 곳으로 갑니다: `은하/별/행성`.
+Like a postal address, from the large to the small: `galaxy/star/planet`.
 
-- `Andromeda Galaxy/1/2`: 안드로메다 1번 별의 두 번째 행성
-- `Milky Way/280`: 우리 은하의 280번 별
-- 별 번호는 1부터 그 은하의 항성계 수까지입니다. 1번은 은하 중심의 별입니다.
-- 은하 이름은 한국어와 다른 이름으로도 찾습니다 (`안드로메다`, `M31`, `NGC 224`).
+- `Andromeda Galaxy/1/2`: the second planet of star 1 of Andromeda
+- `Milky Way/280`: star 280 of the Milky Way
+- Star numbers go from 1 to the number of star systems of the galaxy. Star 1 is the star at its centre.
+- A galaxy is also found by its Korean name and its other names (`안드로메다`, `M31`, `NGC 224`).
 
-## 폴더
+## Folders
 
 ```
 rust-universe-map/
   map/
-    universe.json            지도 전체: 모든 층과 그 층을 이루는 파일 (Gaia Sky 데이터가 있을 때)
-    universe-computed.json   다른 데이터 없이 동작하는 층만 (예제가 읽는 것)
-    grids/                   빛과 먼지의 복셀 격자, 지구 고도
-    galaxies/                은하의 수식 (fitted.json, imagined.json)과 정면 행렬, 은하별 세 그림 (*_xyz*)
-    SOURCES.md               통계 수치의 출처
-    preview/                 결과 그림
-  core/                      Rust 크레이트 universe-map (엔진, 렌더러 없음)
-    src/map.rs                 지도 읽기
-    src/places.rs              주소로 별과 행성 찾기
-    src/procedural.rs          공간을 정육면체로 나눠 그 좌표에서 별을 계산
-    src/stars.rs               밝기에서 분광형, 질량, 크기, 온도
-    src/systems.rs             동반성과 케플러 궤도
-    src/planets.rs             행성의 수, 크기, 간격, 종류
-    src/rare.rs                중성자별, 블랙홀, 갈색왜성 등
-    src/fitted.rs              은하의 수식에서 별 만들기
-    src/photo_volume.rs        세 축의 그림에서 별 만들기
-    src/ground.rs              행성의 지형
-    src/astro.rs, vsop87.rs, bodies.rs   태양계 (Gaia Sky 데이터가 있을 때)
-    src/travel.rs, journey.rs  이름으로 찾기, 그곳까지 가는 길
-    src/survey.rs              SDSS 은하 탐사의 은하들 (Gaia Sky 데이터가 있을 때)
-    examples/address.rs        주소에 무엇이 있는지 출력
-  starmap/                   Gaia Sky 별 카탈로그(particles_*.bin) 리더
-  tools/                     격자와 은하 수식을 만드는 Python 도구
+    universe.json            the whole map: every layer and its files (with Gaia Sky's data)
+    universe-computed.json   only the layers that work without other data (what the examples read)
+    grids/                   voxel grids of light and dust, the Earth's heights
+    galaxies/                the galaxies' formulas (fitted.json, imagined.json), their face-on
+                             matrices, and the three pictures of each (*_xyz*)
+    SOURCES.md               where the statistics come from
+    preview/                 pictures of the results
+  core/                      the Rust crate universe-map (no engine, no renderer)
+    src/map.rs                 reads the map
+    src/places.rs              finds a star and a planet by address
+    src/procedural.rs          divides space into cubes and computes the stars of each
+    src/stars.rs               from brightness to spectral type, mass, size, temperature
+    src/systems.rs             companions and Kepler orbits
+    src/planets.rs             how many planets, their sizes, spacing and kinds
+    src/rare.rs                neutron stars, black holes, brown dwarfs and the like
+    src/fitted.rs              stars from a galaxy's formula
+    src/photo_volume.rs        stars from the pictures along three axes
+    src/galaxy_code.rs         a galaxy as its code, and the prompts it is drawn from
+    src/xyz_make.rs            a galaxy made from the three pictures drawn from its code
+    src/survey.rs              the galaxies of the SDSS survey (with Gaia Sky's data)
+    src/ground.rs              a planet's ground
+    src/astro.rs, vsop87.rs, bodies.rs   the Solar System (with Gaia Sky's data)
+    src/travel.rs, journey.rs  finding a place by name, the way there
+    examples/address.rs        prints what is at an address
+    examples/galaxy_code.rs    prints a galaxy's code, and makes it from its pictures
+  starmap/                   reader of Gaia Sky's star catalogue (particles_*.bin)
+  tools/                     the Python tools that made the grids and the formulas
 ```
 
-## 개발자가 알아야 할 것
+## What a developer needs to know
 
-**빌드와 테스트.** `cargo build --release`, `cargo test --release` (85개 통과). 일부 테스트는 Gaia Sky 데이터(`~/.gaiasky/data`)가 없으면 건너뜁니다.
+**Build and test.** `cargo build --release`, `cargo test --release` (91 pass). Some tests are skipped without Gaia Sky's data (`~/.gaiasky/data`).
 
-**단위와 좌표.** 은하 좌표는 파섹, 태양이 원점, +Z가 은하 중심, +Y가 은하 북극, +X가 은경 90°입니다. 적도 좌표(내부)는 +Z가 춘분점, +X가 적경 90°, +Y가 북쪽입니다. 둘 사이의 변환은 `places::galactic_to_equatorial()`입니다. 항성계 안에서는 AU, 날짜는 J2000부터의 일수입니다.
+**Units and axes.** Galactic coordinates are in parsecs with the Sun at the origin, +Z toward the galactic centre, +Y toward the galactic north pole, +X toward galactic longitude 90°. Equatorial (internal) axes have +Z toward the vernal equinox, +X toward right ascension 90°, +Y north. `places::galactic_to_equatorial()` turns one into the other. Inside a star system lengths are in AU, and dates are days since J2000.
 
-**결정성.** 별은 은하와 번호(또는 정육면체 좌표와 순번)만으로 정해집니다. 난수는 그 값에서 씨앗을 얻으므로 같은 주소는 언제나 같은 별입니다. **별을 만드는 코드나 지도의 숫자를 바꾸면 모든 주소의 별이 달라집니다.** 주소를 공유하는 사람들이 있다면 이런 변경은 지도의 판을 올리는 일입니다. 아직 판 번호 체계는 없습니다.
+**Determinism.** A star is set by its galaxy and its number alone (or by its cube's coordinates and its index). The random numbers take their seed from those, so the same address is always the same star. **Changing the code that makes the stars, or the numbers of the map, changes the star at every address.** If people share addresses, such a change is a new edition of the map. There is no edition numbering yet.
 
-**지도 형식.** `map/universe.json`의 각 블록에 `about`으로 설명이 적혀 있습니다. 복셀 격자는 gzip된 RGBA 바이트(RGB 색, A 밀도)이고 세 번째 축이 가장 빨리 돕니다. 옆의 metadata 파일에 `Grid size: WxHxD`와 `Volume bounds`가 있습니다. 은하를 하나 더하려면 `tools/galaxy_fit.py`로 사진에서 수식을 만들어 `map/galaxies/fitted.json`에 넣거나, `tools/galaxy_xyz.py`로 세 축의 그림을 만들어 `starField.galaxies`에 `photo`로 적습니다. `tools/galaxy_probe.py`는 세 그림의 한 지점에 어떤 별이 생기는지 보여 주는 페이지를 만듭니다. 코드는 고치지 않습니다.
+**The map's format.** Every block of `map/universe.json` says what it is in its `about`. A voxel grid is gzipped RGBA bytes (RGB colour, A density) with the third axis running fastest. The metadata file next to it has `Grid size: WxHxD` and `Volume bounds`. To add a galaxy, make its formula from a photograph with `tools/galaxy_fit.py` and put it in `map/galaxies/fitted.json`, or make the pictures along three axes with `tools/galaxy_xyz.py` and enter it in `starField.galaxies` as a `photo`. `tools/galaxy_probe.py` makes a page that shows which stars come out at a point of the three pictures. No code has to change.
 
-**도구.** `tools/`는 Python이고 numpy, scipy, pillow가 필요합니다 (`match_panorama.py`는 healpy도). 측정된 먼지 지도 원본은 3.25 GB라 `fetch_shells.sh`로 따로 받습니다.
+**Tools.** `tools/` is Python and needs numpy, scipy and pillow (`match_panorama.py` also healpy). The original of the measured dust map is 3.25 GB and is fetched apart with `fetch_shells.sh`. `galaxy_gpt.py` asks OpenAI's image model for a galaxy's three pictures. It reads the key from the environment, never prints it, and has a `--dry-run` that asks nothing.
 
-**Gaia Sky 데이터.** `map/universe.json`의 `stars`, `bodies`, `pictures`는 `~/.gaiasky/data`를 가리킵니다 (Gaia DR3 카탈로그, 행성 정의, VSOP87, 지구 큐브맵, 은하와 성운 카탈로그). Gaia Sky를 설치해 데이터를 받으면 이 층들이 켜집니다. 없으면 `universe-computed.json`을 쓰면 됩니다. 이 저장소에는 그 데이터가 들어 있지 않습니다.
+**Gaia Sky's data.** `stars`, `bodies` and `pictures` in `map/universe.json` point to `~/.gaiasky/data` (the Gaia DR3 catalogue, the planets' definitions, VSOP87, the Earth's cubemaps, the catalogues of galaxies and nebulae, the SDSS list). Installing Gaia Sky and downloading its data turns those layers on. Without it, use `universe-computed.json`. That data is not in this repository.
 
-**그리는 것은 여러분 몫입니다.** 이 크레이트는 아무것도 그리지 않습니다. 카메라 주변의 별은 `procedural::Field`가, 은하의 별은 `fitted`가 위치, 절대등급, 색으로 줍니다. wgpu, Bevy, Godot, 웹 어디에든 붙일 수 있습니다.
+**Drawing is up to you.** This crate draws nothing. `procedural::Field` gives the stars around the camera and `fitted` the stars of a galaxy, as positions, absolute magnitudes and colours. They can be fed to wgpu, Bevy, Godot or the web.
 
-## 도움이 필요한 곳
+## Where help is needed
 
-- **천문학**: 은하의 별 수, 두께, 팽대부, 밝기 분포가 맞는지. 다른 은하에 태양 근처의 별 분포를 쓰는 것이 얼마나 틀린지. `map/SOURCES.md`에서 "not verified"라고 적힌 수치들.
-- **은하**: 더 많은 은하, 더 나은 사진, 타원은하와 불규칙은하의 모양 (지금 수식은 원반 은하용입니다).
-- **실제 측정으로 바꾸기**: 계산된 별 자리에 실제 카탈로그(Gaia, 외계행성 목록)를 더 넓게 쓰는 것.
-- **코드**: 주소 하나에 지도 전체를 읽지 않게 하기(677 MB), 지도 판 번호, WebAssembly, 다른 언어 바인딩.
-- **검증**: 계산된 은하를 지구에서 본 모습과 실제 사진의 비교를 더 많은 은하로.
+- **Astronomy**: whether the galaxies' star counts, thickness, bulges and light profiles are right. How wrong it is to use the Sun's neighbourhood for the stars of other galaxies. The numbers marked "not verified" in `map/SOURCES.md`.
+- **Galaxies**: more galaxies, better photographs, the shapes of elliptical and irregular galaxies (the formulas are for disc galaxies). Measured kinds and sizes for the SDSS galaxies in place of the ones drawn from a seed.
+- **Replacing computed by measured**: using real catalogues (Gaia, the lists of exoplanets) more widely where stars are now computed.
+- **Code**: not reading the whole map for one address (677 MB), edition numbers for the map, WebAssembly, bindings for other languages.
+- **Checking**: comparing more computed galaxies, seen from the Earth, with their real photographs.
 
-## 라이선스와 출처
+## Licence and sources
 
-코드는 [MPL-2.0](LICENSE.md)입니다. Gaia Sky(MPL-2.0, Toni Sagristà Sellés와 기여자들)의 코드를 Rust로 옮긴 부분(`starmap`, `vsop87.rs`, `bodies.rs` 등)이 들어 있습니다.
+The code is under [MPL-2.0](LICENSE.md). It contains parts of Gaia Sky (MPL-2.0, Toni Sagristà Sellés and contributors) ported to Rust (`starmap`, `vsop87.rs`, `bodies.rs` and others).
 
-지도의 데이터는 다음에서 만들어졌습니다.
+The map's data was made from the following.
 
-- 우리 은하 격자: R. Hurt의 정면 상상도 (NASA/JPL-Caltech/ESO), https://www.eso.org/public/images/eso1339g/
-- 태양 주변 먼지: Edenhofer et al. 2023, https://doi.org/10.5281/zenodo.8187943, CC BY 4.0
-- 지구 고도: NOAA NCEI, ETOPO 2022, doi:10.25921/fd45-gt74
-- 지구의 하늘 격자(`sky_*`), 안드로메다 격자, 은하들의 정면 그림과 수식: Gaia Sky가 데이터로 배포하는 은하수 파노라마와 은하 사진(`catalog-nbg/tex/extragal`)에서 계산한 것입니다. 그 사진들 각각의 원저작자와 라이선스는 확인하지 못했습니다. 권리를 가진 분이 알려 주시면 표기하거나 내리겠습니다.
-- 옆에서 본 그림과 사진이 없는 은하의 그림: 이미지 생성 모델이 그린 것
-- 은하의 위치와 크기: Gaia Sky의 `catalog-nbg`
-- 별, 동반성, 행성의 통계: [`map/SOURCES.md`](map/SOURCES.md)
-
-## English summary
-
-rust-universe-map is a map of the universe in which nothing is stored star by star. A galaxy is a formula and a few small matrices (for 18 galaxies, the Milky Way and Andromeda among them: three pictures, one seen along each axis); a star, its companions and its planets are computed from an address such as `Andromeda Galaxy/123456789012/2`, and the same address gives the same star on every machine. Andromeda has 750 billion star systems (about a trillion stars) in about 7.5 MB; the whole map, 94 galaxies and about 1.15 × 10¹³ systems, is 251 MB.
-
-This repository is the map only: data, the Rust code that reads and computes it, and the Python tools that made it. There is no game engine and no renderer. The clips and the picture above were taken in a separate game that uses this map.
-
-I am not an astronomer. This started from the public source and data of [Gaia Sky](https://codeberg.org/gaiasky/gaiasky): I computed formulas of galaxies from its pictures and made the stars from the formulas. Much of it is surely wrong in ways I cannot see. I am opening it so that people who know astronomy, data and code can help each other make something that deserves to be called a map of the universe.
-
-The individual stars and planets are not real ones: they follow the statistics of real ones (sources in `map/SOURCES.md`). What is measured, what is fitted from pictures and what is imagined is listed in the table above.
+- The Milky Way's grids: R. Hurt's face-on artist's impression (NASA/JPL-Caltech/ESO), https://www.eso.org/public/images/eso1339g/
+- Dust around the Sun: Edenhofer et al. 2023, https://doi.org/10.5281/zenodo.8187943, CC BY 4.0
+- The Earth's heights: NOAA NCEI, ETOPO 2022, doi:10.25921/fd45-gt74
+- The grids of the Earth's sky (`sky_*`), Andromeda's grids, and the galaxies' face-on pictures and formulas: computed from the Milky Way panorama and the galaxy photographs that Gaia Sky distributes as data (`catalog-nbg/tex/extragal`). I could not establish the original author and licence of each of those photographs. If you hold rights in one, tell me and I will credit it or take it down.
+- The side views, and the pictures of galaxies without a photograph: drawn by image generation models
+- The galaxies' places and sizes: Gaia Sky's `catalog-nbg`
+- The list of galaxies made from their code: SDSS DR12 as Gaia Sky distributes it (`catalog-sdss-12`, https://www.sdss.org/dr12), not included here
+- The statistics of stars, companions and planets: [`map/SOURCES.md`](map/SOURCES.md)

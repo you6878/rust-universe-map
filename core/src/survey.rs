@@ -28,6 +28,8 @@ pub const OMEGA_M: f64 = 0.315;
 /// x = cos dec sin ra, y = sin dec, z = cos dec cos ra; parsecs from the Sun) and its redshift.
 #[derive(Clone, Copy, Debug)]
 pub struct SurveyGalaxy {
+    /// Its number in the file (Gaia Sky's id: "SDSS <id>" in the game).
+    pub id: i64,
     pub position_pc: DVec3,
     pub z: f64,
 }
@@ -67,6 +69,7 @@ pub fn read(path: &std::path::Path) -> Result<Vec<SurveyGalaxy>, String> {
     let mut out = Vec::with_capacity(n as usize);
     let mut o = 5;
     for _ in 0..n {
+        let id = raw.get(o..o + 8).map(|b| i64::from_be_bytes(b.try_into().unwrap())).ok_or("cut short")?;
         let name_len = be_i32(o + 8)?;
         if name_len < 0 {
             return Err("bad name length".into());
@@ -76,7 +79,7 @@ pub fn read(path: &std::path::Path) -> Result<Vec<SurveyGalaxy>, String> {
         o += 24;
         let z = dist_pc / 1e6 * FILE_H0 / C_KM_S;
         let d = comoving_pc(z);
-        out.push(SurveyGalaxy { position_pc: DVec3::new(dec.cos() * ra.sin(), dec.sin(), dec.cos() * ra.cos()) * d, z });
+        out.push(SurveyGalaxy { id, position_pc: DVec3::new(dec.cos() * ra.sin(), dec.sin(), dec.cos() * ra.cos()) * d, z });
     }
     if o != raw.len() {
         return Err(format!("{} bytes left over after {n} galaxies", raw.len() - o));

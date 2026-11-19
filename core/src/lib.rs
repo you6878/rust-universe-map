@@ -4,13 +4,16 @@
 //! ("Andromeda Galaxy/1/2"); `procedural`, `stars`, `systems`, `planets` and `rare` compute what
 //! is there from the address alone; `fitted` makes the stars of a galaxy from its numbers;
 //! `ground` computes the ground of a planet; `astro`, `vsop87` and `bodies` place the Solar
-//! System; `travel` and `journey` find and fly to a place. Nothing here draws.
+//! System; `travel` and `journey` find and fly to a place; `survey` reads the galaxies of the SDSS
+//! survey, `galaxy_code` is one of them as the few numbers it is made from, and `xyz_make` makes it
+//! from the three pictures an image model drew from that code. Nothing here draws.
 #![allow(dead_code)]
 
 pub mod astro;
 pub mod billboards;
 pub mod bodies;
 pub mod fitted;
+pub mod galaxy_code;
 pub mod ground;
 pub mod journey;
 pub mod map;
@@ -24,6 +27,7 @@ pub mod survey;
 pub mod systems;
 pub mod travel;
 pub mod vsop87;
+pub mod xyz_make;
 
 /// What the modules ask of a renderer: only the turn from galactic to equatorial axes.
 pub mod render {
