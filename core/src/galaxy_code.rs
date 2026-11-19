@@ -156,6 +156,56 @@ impl GalaxyCode {
     }
 }
 
+/// The galaxies of a survey by their number, and their numbers as text, sorted (for searching by
+/// the first digits).
+pub struct SurveyIndex {
+    by_id: std::collections::HashMap<i64, SurveyGalaxy>,
+    ids: Vec<(String, i64)>,
+}
+
+impl SurveyIndex {
+    pub fn new(list: Vec<SurveyGalaxy>) -> SurveyIndex {
+        let mut ids: Vec<(String, i64)> = list.iter().map(|g| (g.id.to_string(), g.id)).collect();
+        ids.sort();
+        SurveyIndex { by_id: list.into_iter().map(|g| (g.id, g)).collect(), ids }
+    }
+
+    pub fn len(&self) -> usize {
+        self.ids.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.ids.is_empty()
+    }
+
+    /// A galaxy by its name, "SDSS <number>".
+    pub fn code_of(&self, name: &str) -> Option<GalaxyCode> {
+        let name = name.trim();
+        let id: i64 = name.strip_prefix("SDSS").or_else(|| name.strip_prefix("sdss"))?.trim().trim_start_matches(['_', '#']).parse().ok()?;
+        self.by_id.get(&id).map(GalaxyCode::new)
+    }
+
+    /// The galaxies whose number begins with `digits` (any of them if none), at most `limit`, the
+    /// nearest to `from` (equatorial, parsecs from the Sun) first.
+    pub fn matching(&self, digits: &str, limit: usize, from: DVec3) -> Vec<GalaxyCode> {
+        let lo = self.ids.partition_point(|(t, _)| t.as_str() < digits);
+        let mut near: Vec<(f64, &SurveyGalaxy)> = self.ids[lo..]
+            .iter()
+            .take_while(|(t, _)| t.starts_with(digits))
+            .filter_map(|(_, id)| self.by_id.get(id))
+            .map(|g| ((g.position_pc - from).length_squared(), g))
+            .collect();
+        let k = limit.min(near.len());
+        if k == 0 {
+            return Vec::new();
+        }
+        near.select_nth_unstable_by(k - 1, |a, b| a.0.total_cmp(&b.0));
+        near.truncate(k);
+        near.sort_by(|a, b| a.0.total_cmp(&b.0));
+        near.into_iter().map(|(_, g)| GalaxyCode::new(g)).collect()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -207,5 +257,19 @@ mod tests {
         let m = GalaxyCode::new(&galaxy(75, 0.1)).axes();
         assert!((m.determinant() - 1.0).abs() < 1e-9);
         assert!((m * m.transpose() - DMat3::IDENTITY).to_cols_array().iter().all(|v| v.abs() < 1e-9));
+    }
+
+    #[test]
+    fn searched_by_the_first_digits_nearest_first() {
+        let at = |id: i64, x: f64| SurveyGalaxy { id, position_pc: DVec3::new(x, 0.0, 0.0), z: 0.1 };
+        let index = SurveyIndex::new(vec![at(75, 9e8), at(750, 1e8), at(7512, 5e8), at(8, 1e7), at(175, 1e6)]);
+        assert_eq!(index.len(), 5);
+        let names = |d: &str, n: usize| index.matching(d, n, DVec3::ZERO).into_iter().map(|c| c.name).collect::<Vec<_>>();
+        assert_eq!(names("75", 10), ["SDSS 750", "SDSS 7512", "SDSS 75"]);
+        assert_eq!(names("75", 2), ["SDSS 750", "SDSS 7512"]);
+        assert_eq!(names("", 1), ["SDSS 175"]);
+        assert!(names("9", 10).is_empty() && names("75", 0).is_empty());
+        assert_eq!(index.code_of("sdss_8").unwrap().name, "SDSS 8");
+        assert!(index.code_of("SDSS 9").is_none());
     }
 }

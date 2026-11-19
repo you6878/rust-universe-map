@@ -40,6 +40,10 @@ fn main() {
     println!("  {:.0} million light years away (now), z {:.3}", code.position_pc.length() * 3.261_563_777 / 1e6, code.z);
     println!("  {}, {:.0} kpc across, absolute magnitude {:.1}, about {:.2e} stars", code.kind, code.half_kpc * 2.0, code.abs_mag, code.stars);
     println!("  axis ratio {:.2} from above, height over width {:.2} from the side", code.axis_ratio, code.thickness);
+    let index = universe_map::galaxy_code::SurveyIndex::new(list);
+    let digits: String = code.name.chars().filter(char::is_ascii_digit).collect();
+    let near: Vec<String> = index.matching(&digits, 6, code.position_pc).into_iter().skip(1).map(|c| format!("{} ({})", c.name, c.kind)).collect();
+    println!("  the nearest whose number begins with {digits}: {}", if near.is_empty() { "none".into() } else { near.join(", ") });
     println!("\nfrom above (y.png):\n  {}", code.prompt_y());
     println!("\nfrom the side, with y.png as the input (x.png):\n  {}", code.prompt_x());
     println!("\nfrom the other side, with y.png as the input (z.png):\n  {}", code.prompt_z());

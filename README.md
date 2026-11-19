@@ -185,7 +185,7 @@ rust-universe-map/
 
 ## What a developer needs to know
 
-**Build and test.** `cargo build --release`, `cargo test --release` (91 pass). Some tests are skipped without Gaia Sky's data (`~/.gaiasky/data`).
+**Build and test.** `cargo build --release`, `cargo test --release` (92 pass). Some tests are skipped without Gaia Sky's data (`~/.gaiasky/data`).
 
 **Units and axes.** Galactic coordinates are in parsecs with the Sun at the origin, +Z toward the galactic centre, +Y toward the galactic north pole, +X toward galactic longitude 90°. Equatorial (internal) axes have +Z toward the vernal equinox, +X toward right ascension 90°, +Y north. `places::galactic_to_equatorial()` turns one into the other. Inside a star system lengths are in AU, and dates are days since J2000.
 
