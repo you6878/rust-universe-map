@@ -1,0 +1,14 @@
+[package]
+name = "universe-map"
+version = "0.1.0"
+edition = "2021"
+description = "A computed map of the universe: galaxies as formulas, stars and planets computed from their address, nothing stored"
+license = "MPL-2.0"
+
+[dependencies]
+starmap = { path = "../starmap" }
+serde_json = "1"
+flate2 = "1"
+glam = "0.34"
+bytemuck = { version = "1", features = ["derive"] }
+image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }

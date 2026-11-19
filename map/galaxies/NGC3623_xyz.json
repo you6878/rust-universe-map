@@ -1,0 +1,198 @@
+{
+ "name": "M65",
+ "size": 1024,
+ "stars": 172306833236.1497,
+ "views": {
+  "y": "NGC3623_xyz_y.png",
+  "x": "NGC3623_xyz_x.png",
+  "z": "NGC3623_xyz_z.png"
+ },
+ "frame": {
+  "kpcPerPx": 0.04320456118924125,
+  "middlePx": {
+   "col": 507.28,
+   "row": 513.28
+  },
+  "wAxis": [
+   0.10737312070398271,
+   0.9942187953113177
+  ],
+  "uAxis": [
+   -0.9942187953113177,
+   0.10737312070398271
+  ],
+  "likePhotograph": 0.8808558563674123
+ },
+ "about": "a galaxy from three views (tools/galaxy_xyz.py), size x size pixels each, kpcPerPx a pixel: y seen from above, rows +U, columns +W; x seen along U, columns +W, rows -Y; z seen along W, columns +U, rows -Y (Y up, out of the disc). In the galaxy's own frame (fitted.json: X its long axis, Z its short one, parsecs from its middle) a place is at W = X wAxis[0] + Z wAxis[1], U = X uAxis[0] + Z uAxis[1], so at column middlePx.col + W / kpcPerPx, row middlePx.row + U / kpcPerPx of the views. Light is sRGB^2.2.",
+ "bulgePx": {
+  "col": 501.5158693043138,
+  "row": 512.9281988247991
+ },
+ "light": {
+  "files": {
+   "y": "NGC3623_xyz_y_light.png",
+   "x": "NGC3623_xyz_x_light.png",
+   "z": "NGC3623_xyz_z_light.png"
+  },
+  "log10Range": [
+   -10.70093017819074,
+   -6.972
+  ],
+  "profile": {
+   "name": "M65",
+   "tiltDeg": 72.09,
+   "source": "DESI Legacy Surveys DR10 r band (https://www.legacysurvey.org/viewer/cutout.fits?ra=169.7330&dec=13.0922&layer=ls-dr10&pixscale=0.5&size=1920&bands=r), median in ellipses of b/a 0.328 along the long axis (tools/galaxy_profile.py); the innermost arcsecond smoothed by the seeing",
+   "table": [
+    [
+     0.078,
+     17.43
+    ],
+    [
+     0.1301,
+     18.1
+    ],
+    [
+     0.1821,
+     18.39
+    ],
+    [
+     0.2341,
+     18.68
+    ],
+    [
+     0.2861,
+     18.78
+    ],
+    [
+     0.3382,
+     18.98
+    ],
+    [
+     0.3902,
+     19.11
+    ],
+    [
+     0.4422,
+     19.25
+    ],
+    [
+     0.4942,
+     19.34
+    ],
+    [
+     0.5559,
+     19.41
+    ],
+    [
+     0.6321,
+     19.49
+    ],
+    [
+     0.7187,
+     19.64
+    ],
+    [
+     0.8172,
+     19.74
+    ],
+    [
+     0.9291,
+     19.84
+    ],
+    [
+     1.0564,
+     19.93
+    ],
+    [
+     1.2012,
+     20.02
+    ],
+    [
+     1.3658,
+     20.2
+    ],
+    [
+     1.553,
+     20.35
+    ],
+    [
+     1.7658,
+     20.51
+    ],
+    [
+     2.0077,
+     20.6
+    ],
+    [
+     2.2828,
+     20.73
+    ],
+    [
+     2.5956,
+     20.85
+    ],
+    [
+     2.9513,
+     21.04
+    ],
+    [
+     3.3557,
+     21.3
+    ],
+    [
+     3.8155,
+     21.48
+    ],
+    [
+     4.3384,
+     21.68
+    ],
+    [
+     4.9328,
+     21.8
+    ],
+    [
+     5.6088,
+     22.02
+    ],
+    [
+     6.3773,
+     22.26
+    ],
+    [
+     7.2512,
+     22.63
+    ],
+    [
+     8.2448,
+     23.01
+    ],
+    [
+     9.3746,
+     23.64
+    ],
+    [
+     10.6591,
+     24.29
+    ],
+    [
+     12.1197,
+     24.86
+    ],
+    [
+     13.7804,
+     25.5
+    ],
+    [
+     15.6687,
+     26.43
+    ],
+    [
+     17.8158,
+     27.47
+    ]
+   ]
+  },
+  "about": "the light put back (tools/galaxy_xyz.py --profile): 16-bit, 0 none, else log10(light) = lo + (v - 1) / 65534 (hi - lo)"
+ }
+}

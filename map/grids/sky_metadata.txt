@@ -1,0 +1,6 @@
+# Dust and light around the Sun that make the sky of the Earth the Milky Way panorama of Gaia Sky,
+# on top of the galaxy as a whole and of the measured dust. Made by tools/match_panorama.py.
+# Axes: (galactic centre, north, longitude 90).
+Grid size: 400x128x400
+Volume bounds: [-1250.0, -400.0, -1250.0] to [1250.0, 400.0, 1250.0]
+# Bounds are in parsecs: sizePc 1, centrePc [0, 0, 0], gamma 2, lightPerKpc 17.63, dustPerKpc 22.4.

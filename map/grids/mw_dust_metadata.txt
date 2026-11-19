@@ -1,0 +1,5 @@
+# Made by tools/make_galaxy.py from the face-on map of the Milky Way by R. Hurt (NASA/JPL-Caltech/ESO).
+# Axes: (from the galactic centre away from the Sun, north, longitude 90).
+Grid size: 640x32x640
+Volume bounds: [-20.0, -0.5, -20.0] to [20.0, 0.5, 20.0]
+# Bounds are in kpc: sizePc 1000, centrePc [0, 0, 8000], gamma 2. dustPerKpc 6.1.

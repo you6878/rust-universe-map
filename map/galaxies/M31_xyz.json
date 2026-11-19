@@ -1,0 +1,113 @@
+{
+ "name": "Andromeda Galaxy",
+ "size": 1024,
+ "stars": 1000000000000.0,
+ "views": {
+  "y": "M31_xyz_y.png",
+  "x": "M31_xyz_x.png",
+  "z": "M31_xyz_z.png"
+ },
+ "frame": {
+  "kpcPerPx": 0.054799999999999995,
+  "middlePx": {
+   "col": 511.28,
+   "row": 511.28
+  },
+  "wAxis": [
+   0.6835466877177884,
+   -0.7299067924810949
+  ],
+  "uAxis": [
+   0.7299067924810949,
+   0.6835466877177884
+  ],
+  "likePhotograph": 0.9931803614516371
+ },
+ "about": "a galaxy from three views (tools/galaxy_xyz.py), size x size pixels each, kpcPerPx a pixel: y seen from above, rows +U, columns +W; x seen along U, columns +W, rows -Y; z seen along W, columns +U, rows -Y (Y up, out of the disc). In the galaxy's own frame (fitted.json: X its long axis, Z its short one, parsecs from its middle) a place is at W = X wAxis[0] + Z wAxis[1], U = X uAxis[0] + Z uAxis[1], so at column middlePx.col + W / kpcPerPx, row middlePx.row + U / kpcPerPx of the views. Light is sRGB^2.2.",
+ "bulgePx": {
+  "col": 541.0603722576176,
+  "row": 503.20281721932406
+ },
+ "light": {
+  "files": {
+   "y": "M31_xyz_y_light.png",
+   "x": "M31_xyz_x_light.png",
+   "z": "M31_xyz_z_light.png"
+  },
+  "log10Range": [
+   -10.419723124069801,
+   -5.800000000000001
+  ],
+  "profile": {
+   "tiltDeg": 77.0,
+   "source": "Courteau et al. 2011, ApJ 739, 20: R-band major-axis profile, read to ~0.5 mag",
+   "table": [
+    [
+     0.05,
+     14.5
+    ],
+    [
+     0.1,
+     15.2
+    ],
+    [
+     0.25,
+     16.0
+    ],
+    [
+     0.5,
+     16.8
+    ],
+    [
+     1,
+     17.6
+    ],
+    [
+     2,
+     18.6
+    ],
+    [
+     3,
+     19.1
+    ],
+    [
+     5,
+     19.8
+    ],
+    [
+     8,
+     20.4
+    ],
+    [
+     10,
+     20.8
+    ],
+    [
+     12,
+     21.2
+    ],
+    [
+     15,
+     21.7
+    ],
+    [
+     20,
+     22.7
+    ],
+    [
+     25,
+     23.8
+    ],
+    [
+     30,
+     25.0
+    ],
+    [
+     35,
+     26.2
+    ]
+   ]
+  },
+  "about": "the light put back (tools/galaxy_xyz.py --profile): 16-bit, 0 none, else log10(light) = lo + (v - 1) / 65534 (hi - lo)"
+ }
+}

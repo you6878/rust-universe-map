@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>@NAME@ 별 탐침</title>
+<style>
+  :root { --bg: #0b0c10; --panel: #15171d; --line: #2a2d36; --text: #e8e6e1; --dim: #9a978f; --accent: #f0c27a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 -apple-system, "Apple SD Gothic Neo", sans-serif; }
+  header { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  header h1 { margin: 0; font-size: 17px; }
+  header p { margin: 2px 0 0; color: var(--dim); font-size: 12px; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 16px; padding: 16px; }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+  .views { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .view { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+  .view h2 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
+  .view h2 small { color: var(--dim); font-weight: 400; }
+  .view canvas { width: 100%; aspect-ratio: 1; display: block; cursor: crosshair; background: #000; border-radius: 4px; }
+  .stars { margin-top: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+  .stars canvas { width: 100%; max-width: 720px; aspect-ratio: 1; display: block; margin: 0 auto; background: #000; border-radius: 4px; cursor: grab; }
+  aside { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; align-self: start; }
+  label { display: block; color: var(--dim); font-size: 12px; margin-top: 8px; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  input[type=number] { width: 100%; background: #0e1015; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px; font: inherit; }
+  input[type=range] { width: 100%; }
+  button { margin-top: 10px; width: 100%; padding: 8px; background: var(--accent); color: #1a1408; border: 0; border-radius: 6px; font: inherit; font-weight: 600; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+  td { padding: 3px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:first-child { color: var(--dim); width: 46%; }
+  .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin-right: 4px; border: 1px solid #444; }
+  .note { color: var(--dim); font-size: 12px; margin-top: 10px; }
+  .classes span { display: inline-block; margin-right: 8px; }
+  .legend { color: var(--dim); font-size: 12px; margin-top: 6px; }
+  .legend b { color: #7fd1ff; } .legend i { color: #ff9f7f; font-style: normal; font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+  <h1>@NAME@ 별 탐침 — 사진 3장(X·Y·Z)으로, 게임 좌표 그대로</h1>
+  <p>세 그림 모두 1024 픽셀, 픽셀 하나 = <span id="pcpx"></span>. 은하 전체 별 <span id="total"></span>개를 위 그림의 빛(어디에) × 옆 그림 두 장(얼마나 높이)대로 나눕니다. 지구에서 본 모습이 실제 사진과 <span id="like"></span> 일치하도록 맞춘 좌표입니다.</p>
+</header>
+<main>
+  <section>
+    <div class="views">
+      <div class="view"><h2>위에서 <small>클릭 → X, Z</small></h2><canvas id="cy" width="512" height="512"></canvas></div>
+      <div class="view"><h2>옆에서 (U 방향) <small>클릭 → 가로 위치, Y</small></h2><canvas id="cu" width="512" height="512"></canvas></div>
+      <div class="view"><h2>옆에서 (W 방향) <small>클릭 → 가로 위치, Y</small></h2><canvas id="cw" width="512" height="512"></canvas></div>
+    </div>
+    <p class="legend">위 그림의 화살표: <b>X</b> 은하 긴 축, <i>Z</i> 짧은 축(게임의 은하 좌표). 그림은 사진의 방향 그대로라 축이 비스듬합니다. 옆 그림 두 장은 위 그림의 세로(U)·가로(W) 방향에서 본 모습.</p>
+    <div class="stars">
+      <h2 style="margin:0 0 6px;font-size:13px">정육면체 안의 별 <small style="color:var(--dim);font-weight:400">드래그해서 돌려보기</small></h2>
+      <canvas id="cs" width="720" height="720"></canvas>
+    </div>
+  </section>
+  <aside>
+    <label>위치 (pc, 은하 중심 기준, 게임 좌표) — X 긴 축 · Y 위 · Z 짧은 축</label>
+    <div class="row">
+      <input type="number" id="x" step="50" value="8000">
+      <input type="number" id="y" step="10" value="0">
+      <input type="number" id="z" step="50" value="0">
+    </div>
+    <label>정육면체 크기: <b id="sizeOut"></b></label>
+    <input type="range" id="size" min="5" max="200" step="1" value="30">
+    <button id="go">별 만들기</button>
+    <table id="info"></table>
+    <div class="classes" id="classes"></div>
+    <p class="note">같은 자리는 언제나 같은 별이 나옵니다(복셀 번호와 픽셀값이 난수의 씨앗). 정육면체가 한 픽셀(<span id="pcpx2"></span>)보다 크면 가운데 복셀의 밀도로 셉니다. 그리는 별은 15만 개까지(그 이상은 일부만 그리고 수는 그대로 셈). 옆 그림의 가운데 어두운 먼지띠는 별을 가릴 뿐 없애지 않으므로 메워서 셉니다.</p>
+  </aside>
+</main>
+<script>
+const STARS = @STARS@, N = 1024, DRAW_MAX = 150000;
+// the frame (tools/galaxy_xyz.py --photo): a place (X, Z) of the galaxy is at W = X w0 + Z w1,
+// U = X u0 + Z u1 (pc); column mc + W / PC, row mr + U / PC of the top view
+const F = @FRAME@;
+const PC = F.kpcPerPx * 1000, MC = F.middlePx.col, MR = F.middlePx.row, MID = (N - 1) / 2;
+const [W0, W1] = F.wAxis, [U0, U1] = F.uAxis;
+const fmt = (v) => v >= 1e12 ? (v / 1e12).toFixed(2) + "조" : v >= 1e8 ? (v / 1e8).toFixed(2) + "억" : v >= 1e4 ? (v / 1e4).toFixed(2) + "만" : v >= 100 ? Math.round(v).toLocaleString() : v.toPrecision(3);
+document.getElementById("pcpx").textContent = document.getElementById("pcpx2").textContent = `${PC.toFixed(1)} pc (${(PC * 3.2616).toFixed(0)} 광년)`;
+document.getElementById("total").textContent = fmt(STARS);
+document.getElementById("like").textContent = F.likePhotograph ? F.likePhotograph.toFixed(3) : "—";
+
+// ---- the three pictures: their pixels, and their light (sRGB^2.2)
+const views = {};
+function loadView(key, src) {
+  return new Promise((done) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas"); c.width = N; c.height = N;
+      const g = c.getContext("2d"); g.drawImage(img, 0, 0, N, N);
+      const rgb = g.getImageData(0, 0, N, N).data;
+      const light = new Float32Array(N * N);
+      for (let i = 0; i < N * N; i++) light[i] = (Math.pow(rgb[4 * i] / 255, 2.2) + Math.pow(rgb[4 * i + 1] / 255, 2.2) + Math.pow(rgb[4 * i + 2] / 255, 2.2)) / 3;
+      views[key] = { img, rgb, light };
+      done();
+    };
+    img.src = src;
+  });
+}
+const clampI = (v) => Math.max(0, Math.min(N - 1, Math.round(v)));
+const pixel = (v, col, row) => { const i = 4 * (clampI(row) * N + clampI(col)); return [v.rgb[i], v.rgb[i + 1], v.rgb[i + 2]]; };
+let topSum = 0;
+
+// ---- the game's coordinates <-> the pictures
+function toPictures(x, y, z) {
+  const w = x * W0 + z * W1, u = x * U0 + z * U1;
+  return { col: MC + w / PC, row: MR + u / PC, yr: MID - y / PC };
+}
+function fromTop(col, row) {
+  const w = (col - MC) * PC, u = (row - MR) * PC;
+  return [w * W0 + u * U0, w * W1 + u * U1];
+}
+
+// ---- a column of an edge view with its dust lane filled (dust hides stars, it does not take them away)
+const filledCache = {};
+function filled(key, col) {
+  const id = key + col;
+  if (filledCache[id]) return filledCache[id];
+  const v = views[key], p = new Float32Array(N), up = new Float32Array(N);
+  for (let k = 0; k < N; k++) p[k] = v.light[k * N + col];
+  let m = 0;
+  for (let k = 0; k < N; k++) { m = Math.max(m, p[k]); up[k] = m; }
+  m = 0;
+  for (let k = N - 1; k >= 0; k--) { m = Math.max(m, p[k]); p[k] = Math.max(p[k], Math.min(up[k], m)); }
+  return filledCache[id] = p;
+}
+
+// ---- the stars of a voxel: the top view's share times the share in height there
+// (the view along U has the top view's columns, the one along W its rows)
+function voxel(x, y, z) {
+  const { col, row, yr } = toPictures(x, y, z);
+  const ci = clampI(col), ri = clampI(row), yi = clampI(yr);
+  const inside = col >= -0.5 && col < N - 0.5 && row >= -0.5 && row < N - 0.5 && yr >= -0.5 && yr < N - 0.5;
+  const top = inside ? views.y.light[ri * N + ci] / topSum : 0;
+  const a = filled("u", ci), b = filled("w", ri);
+  let sum = 0;
+  for (let k = 0; k < N; k++) sum += a[k] * b[k];
+  const height = sum > 0 && inside ? a[yi] * b[yi] / sum : 0;
+  const stars = STARS * top * height;
+  return { col, row, yr, top, height, stars, perPc3: stars / (PC * PC * PC), rgb: pixel(views.y, col, row), rgbU: pixel(views.u, col, yr), rgbW: pixel(views.w, row, yr) };
+}
+
+// ---- random numbers seeded by the voxel and its pixel's value
+function hash(...v) { let h = 2166136261 >>> 0; for (const n of v) { h ^= n & 0xffffffff; h = Math.imul(h, 16777619) >>> 0; h ^= h >>> 13; } return h >>> 0; }
+function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+// ---- a star's mass (Kroupa: m^-1.3 from 0.08 to 0.5, m^-2.3 above), up to mMax
+function massDraw(r, mMax) {
+  const a1 = (Math.pow(0.08, -0.3) - Math.pow(0.5, -0.3)) / 0.3;
+  const hi = Math.max(mMax, 0.5);
+  const a2 = 0.5 * (Math.pow(0.5, -1.3) - Math.pow(hi, -1.3)) / 1.3;
+  const seg = (lo, top, alpha, v) => Math.pow(Math.pow(lo, 1 - alpha) + v * (Math.pow(top, 1 - alpha) - Math.pow(lo, 1 - alpha)), 1 / (1 - alpha));
+  return r() < a1 / (a1 + a2) ? seg(0.08, Math.min(0.5, mMax), 1.3, r()) : seg(0.5, hi, 2.3, r());
+}
+// main sequence, roughly: luminosity (Suns) and surface temperature (K)
+const lum = (m) => m < 0.43 ? 0.23 * Math.pow(m, 2.3) : m < 2 ? Math.pow(m, 4) : 1.4 * Math.pow(m, 3.5);
+const kelvin = (m) => Math.min(40000, Math.max(2600, 5772 * Math.pow(m, 0.55)));
+function colourOf(k) {
+  const t = k / 100;
+  const r = t <= 66 ? 1 : Math.min(1, Math.max(0, 1.292936 * Math.pow(t - 60, -0.1332047592)));
+  const g = t <= 66 ? Math.min(1, Math.max(0, 0.3900816 * Math.log(t) - 0.6318414)) : Math.min(1, Math.max(0, 1.1298909 * Math.pow(t - 60, -0.0755148492)));
+  const b = t >= 66 ? 1 : t <= 19 ? 0 : Math.min(1, Math.max(0, 0.5432068 * Math.log(t - 10) - 1.1962541));
+  return [r, g, b];
+}
+const classOf = (k) => k >= 30000 ? "O" : k >= 10000 ? "B" : k >= 7500 ? "A" : k >= 6000 ? "F" : k >= 5200 ? "G" : k >= 3700 ? "K" : "M";
+
+// ---- the stars of the cube
+let stars = [], cubeSide = 30, yaw = 0.6, pitch = 0.35;
+function make() {
+  const x = +document.getElementById("x").value, y = +document.getElementById("y").value, z = +document.getElementById("z").value;
+  cubeSide = +document.getElementById("size").value;
+  const v = voxel(x, y, z);
+  const expected = v.perPc3 * cubeSide ** 3;
+  // young stars where the top pixel is blue, old ones where it is yellow or red
+  const [R, G, B] = v.rgb;
+  const young = Math.min(1, Math.max(0, (B / Math.max(R, 1) - 0.85) / 0.4));
+  const mMax = 0.9 + young * 39.1;
+  const r = rng(hash(clampI(v.col), clampI(v.row), clampI(v.yr), Math.round(x), Math.round(y), Math.round(z), cubeSide, R, G, B));
+  let count;
+  if (expected < 30) { let L = Math.exp(-expected), k = 0, p = 1; do { k++; p *= r(); } while (p > L); count = k - 1; }
+  else { const u1 = Math.max(r(), 1e-12), u2 = r(); count = Math.max(0, Math.round(expected + Math.sqrt(expected) * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2))); }
+  const drawn = Math.min(count, DRAW_MAX);
+  stars = [];
+  const classes = { O: 0, B: 0, A: 0, F: 0, G: 0, K: 0, M: 0 };
+  let brightest = 0;
+  for (let i = 0; i < drawn; i++) {
+    const m = massDraw(r, mMax), k = kelvin(m), L = lum(m);
+    classes[classOf(k)]++;
+    brightest = Math.max(brightest, L);
+    stars.push({ p: [(r() - 0.5) * cubeSide, (r() - 0.5) * cubeSide, (r() - 0.5) * cubeSide], L, c: colourOf(k) });
+  }
+  const sw = (c) => `<span class="swatch" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${c.join(", ")}`;
+  document.getElementById("info").innerHTML = `
+    <tr><td>위 그림 픽셀</td><td>${sw(v.rgb)} @ ${v.col.toFixed(0)}, ${v.row.toFixed(0)}</td></tr>
+    <tr><td>옆 그림 픽셀 (U / W)</td><td>${sw(v.rgbU)}<br>${sw(v.rgbW)}</td></tr>
+    <tr><td>은하 중심에서</td><td>${(Math.hypot(x, z) / 1000).toFixed(2)} kpc, 높이 ${(y / 1000).toFixed(2)} kpc</td></tr>
+    <tr><td>위에서 본 빛의 몫</td><td>${(v.top * 100).toPrecision(3)}%</td></tr>
+    <tr><td>그 기둥 안 높이의 몫</td><td>${(v.height * 100).toPrecision(3)}%</td></tr>
+    <tr><td>복셀 하나 (${PC.toFixed(0)} pc)³의 별</td><td>${fmt(v.stars)}</td></tr>
+    <tr><td>밀도</td><td>${v.perPc3.toPrecision(3)} 개/pc³ (태양 근처 ≈ 0.1)</td></tr>
+    <tr><td>정육면체 ${cubeSide} pc 안</td><td>평균 ${fmt(expected)} → <b>${fmt(count)}개</b>${count > drawn ? ` (그린 것 ${fmt(drawn)})` : ""}</td></tr>
+    <tr><td>별 사이 평균 거리</td><td>${v.perPc3 > 0 ? (Math.cbrt(1 / v.perPc3) * 3.2616).toPrecision(3) + " 광년" : "—"}</td></tr>
+    <tr><td>젊은 별 비율 (픽셀 파랑)</td><td>${(young * 100).toFixed(0)}% → 가장 무거운 별 ${mMax.toFixed(1)} 태양질량까지</td></tr>
+    <tr><td>가장 밝은 별</td><td>${brightest ? fmt(brightest) + " 태양" : "—"}</td></tr>`;
+  document.getElementById("classes").innerHTML = Object.entries(classes).map(([c, n]) => `<span><b>${c}</b> ${fmt(n)}</span>`).join("");
+  drawViews(v);
+  drawStars();
+}
+
+// ---- the pictures with the place marked, and the galaxy's axes on the top one
+function drawViews(v) {
+  const mark = (id, img, col, row) => {
+    const c = document.getElementById(id), g = c.getContext("2d");
+    g.drawImage(img, 0, 0, c.width, c.height);
+    const s = c.width / N;
+    g.strokeStyle = "#f0c27a"; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(col * s, 0); g.lineTo(col * s, c.height); g.moveTo(0, row * s); g.lineTo(c.width, row * s); g.stroke();
+    g.strokeRect(col * s - 6, row * s - 6, 12, 12);
+    return [g, s];
+  };
+  const [g, s] = mark("cy", views.y.img, v.col, v.row);
+  const arrow = (dc, dr, colour, label) => {
+    const L = 10000 / PC;     // 10 kpc
+    const x0 = MC * s, y0 = MR * s, x1 = (MC + dc * L) * s, y1 = (MR + dr * L) * s;
+    g.strokeStyle = g.fillStyle = colour; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+    g.font = "bold 13px sans-serif"; g.fillText(label, x1 + 4, y1 + 4);
+  };
+  arrow(W0, U0, "#7fd1ff", "X 10kpc");
+  arrow(W1, U1, "#ff9f7f", "Z");
+  mark("cu", views.u.img, v.col, v.yr);
+  mark("cw", views.w.img, v.row, v.yr);
+}
+
+// ---- the cube, turned, its stars added up as light
+function drawStars() {
+  const c = document.getElementById("cs"), g = c.getContext("2d"), W = c.width;
+  const acc = new Float32Array(W * W * 3);
+  const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+  const scale = W * 0.55 / cubeSide;
+  const turn = (p) => { const x1 = cy * p[0] + sy * p[2], z1 = -sy * p[0] + cy * p[2]; return [x1, cp * p[1] - sp * z1, sp * p[1] + cp * z1]; };
+  for (const s of stars) {
+    const q = turn(s.p);
+    const px = Math.round(W / 2 + q[0] * scale), py = Math.round(W / 2 - q[1] * scale);
+    const b = Math.min(4, 0.08 + 0.25 * Math.log10(1 + s.L * 50));
+    const rad = s.L > 100 ? 2 : s.L > 5 ? 1 : 0;
+    for (let dy = -rad; dy <= rad; dy++) for (let dx = -rad; dx <= rad; dx++) {
+      const x = px + dx, y = py + dy;
+      if (x < 0 || y < 0 || x >= W || y >= W) continue;
+      const f = b / (1 + dx * dx + dy * dy), i = 3 * (y * W + x);
+      acc[i] += s.c[0] * f; acc[i + 1] += s.c[1] * f; acc[i + 2] += s.c[2] * f;
+    }
+  }
+  const out = g.createImageData(W, W);
+  for (let i = 0; i < W * W; i++) { for (let k = 0; k < 3; k++) out.data[4 * i + k] = 255 * (1 - Math.exp(-acc[3 * i + k] * 1.6)); out.data[4 * i + 3] = 255; }
+  g.putImageData(out, 0, 0);
+  g.strokeStyle = "rgba(240,194,122,0.35)";
+  const h = cubeSide / 2, corners = [];
+  for (const a of [-h, h]) for (const b of [-h, h]) for (const d of [-h, h]) corners.push(turn([a, b, d]));
+  const P = (q) => [W / 2 + q[0] * scale, W / 2 - q[1] * scale];
+  g.beginPath();
+  for (let i = 0; i < 8; i++) for (let j = i + 1; j < 8; j++) {
+    const diff = i ^ j; if (diff !== 1 && diff !== 2 && diff !== 4) continue;
+    const [x1, y1] = P(corners[i]), [x2, y2] = P(corners[j]); g.moveTo(x1, y1); g.lineTo(x2, y2);
+  }
+  g.stroke();
+  g.fillStyle = "#9a978f"; g.font = "12px sans-serif"; g.fillText(`${cubeSide} pc (${(cubeSide * 3.2616).toFixed(0)} 광년) 정육면체`, 10, 18);
+}
+
+// ---- clicking the pictures sets the place (in the game's coordinates)
+const get = (k) => +document.getElementById(k).value;
+const set = (k, v) => document.getElementById(k).value = Math.round(v);
+function clickTo(id, f) {
+  document.getElementById(id).addEventListener("click", (e) => {
+    const r = e.target.getBoundingClientRect();
+    f((e.clientX - r.left) / r.width * N, (e.clientY - r.top) / r.height * N); make();
+  });
+}
+clickTo("cy", (col, row) => { const [x, z] = fromTop(col, row); set("x", x); set("z", z); });
+// the view along U: its columns are the top view's (W); the place keeps its U
+clickTo("cu", (col, row) => { const here = toPictures(get("x"), 0, get("z")); const [x, z] = fromTop(col, here.row); set("x", x); set("z", z); set("y", (MID - row) * PC); });
+// the view along W: its columns are the top view's rows (U); the place keeps its W
+clickTo("cw", (col, row) => { const here = toPictures(get("x"), 0, get("z")); const [x, z] = fromTop(here.col, col); set("x", x); set("z", z); set("y", (MID - row) * PC); });
+document.getElementById("go").addEventListener("click", make);
+const sizeIn = document.getElementById("size"), sizeOut = document.getElementById("sizeOut");
+const showSize = () => sizeOut.textContent = `${sizeIn.value} pc (${(sizeIn.value * 3.2616).toFixed(0)} 광년)`;
+sizeIn.addEventListener("input", showSize); sizeIn.addEventListener("change", make); showSize();
+let dragging = null;
+const cs = document.getElementById("cs");
+cs.addEventListener("pointerdown", (e) => { dragging = [e.clientX, e.clientY]; cs.setPointerCapture(e.pointerId); });
+cs.addEventListener("pointermove", (e) => { if (!dragging) return; yaw += (e.clientX - dragging[0]) * 0.01; pitch += (e.clientY - dragging[1]) * 0.01; dragging = [e.clientX, e.clientY]; drawStars(); });
+cs.addEventListener("pointerup", () => dragging = null);
+
+Promise.all([loadView("y", "@Y@"), loadView("u", "@U@"), loadView("w", "@W@")]).then(() => {
+  for (let i = 0; i < N * N; i++) topSum += views.y.light[i];
+  make();
+});
+</script>
+</body>
+</html>

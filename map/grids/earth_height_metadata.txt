@@ -1,0 +1,3 @@
+Grid size: 10800 5400
+Heights in metres: -10688 7464
+Source: surface60.nc

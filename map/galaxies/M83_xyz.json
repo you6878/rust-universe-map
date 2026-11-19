@@ -1,0 +1,31 @@
+{
+ "name": "Southern Pinwheel Galaxy",
+ "size": 1024,
+ "stars": 299434957596.96173,
+ "views": {
+  "y": "M83_xyz_y.png",
+  "x": "M83_xyz_x.png",
+  "z": "M83_xyz_z.png"
+ },
+ "frame": {
+  "kpcPerPx": 0.026909118671091803,
+  "middlePx": {
+   "col": 503.28,
+   "row": 500.28
+  },
+  "wAxis": [
+   0.17334426542445727,
+   0.9848612925912233
+  ],
+  "uAxis": [
+   -0.9848612925912233,
+   0.17334426542445727
+  ],
+  "likePhotograph": 0.869064414981587
+ },
+ "about": "a galaxy from three views (tools/galaxy_xyz.py), size x size pixels each, kpcPerPx a pixel: y seen from above, rows +U, columns +W; x seen along U, columns +W, rows -Y; z seen along W, columns +U, rows -Y (Y up, out of the disc). In the galaxy's own frame (fitted.json: X its long axis, Z its short one, parsecs from its middle) a place is at W = X wAxis[0] + Z wAxis[1], U = X uAxis[0] + Z uAxis[1], so at column middlePx.col + W / kpcPerPx, row middlePx.row + U / kpcPerPx of the views. Light is sRGB^2.2.",
+ "bulgePx": {
+  "col": 487.7537752728274,
+  "row": 510.5025365229955
+ }
+}

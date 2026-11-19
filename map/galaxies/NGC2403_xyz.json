@@ -1,0 +1,31 @@
+{
+ "name": "NGC 2403",
+ "size": 1024,
+ "stars": 52620714495.68799,
+ "views": {
+  "y": "NGC2403_xyz_y.png",
+  "x": "NGC2403_xyz_x.png",
+  "z": "NGC2403_xyz_z.png"
+ },
+ "frame": {
+  "kpcPerPx": 0.03233200493386695,
+  "middlePx": {
+   "col": 511.28,
+   "row": 510.28
+  },
+  "wAxis": [
+   0.8799526421398145,
+   0.47506141454675044
+  ],
+  "uAxis": [
+   -0.47506141454675044,
+   0.8799526421398145
+  ],
+  "likePhotograph": 0.9703596464564842
+ },
+ "about": "a galaxy from three views (tools/galaxy_xyz.py), size x size pixels each, kpcPerPx a pixel: y seen from above, rows +U, columns +W; x seen along U, columns +W, rows -Y; z seen along W, columns +U, rows -Y (Y up, out of the disc). In the galaxy's own frame (fitted.json: X its long axis, Z its short one, parsecs from its middle) a place is at W = X wAxis[0] + Z wAxis[1], U = X uAxis[0] + Z uAxis[1], so at column middlePx.col + W / kpcPerPx, row middlePx.row + U / kpcPerPx of the views. Light is sRGB^2.2.",
+ "bulgePx": {
+  "col": 507.91164884031485,
+  "row": 503.3773354199552
+ }
+}

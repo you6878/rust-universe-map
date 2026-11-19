@@ -1,0 +1,5 @@
+# Dust around the Sun from Edenhofer et al. (2023), https://doi.org/10.5281/zenodo.8187943, CC BY 4.0.
+# Made by tools/dust_edenhofer.py from 516 of the 516 distance shells. Axes: (galactic centre, north, longitude 90).
+Grid size: 400x128x400
+Volume bounds: [-1250.0, -400.0, -1250.0] to [1250.0, 400.0, 1250.0]
+# Bounds are in parsecs: sizePc 1, centrePc [0, 0, 0], gamma 2, dustPerKpc 18.0.

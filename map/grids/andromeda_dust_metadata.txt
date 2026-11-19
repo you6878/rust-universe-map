@@ -1,0 +1,4 @@
+# Made by tools/photo_galaxy.py from M31.jpg. Axes: (the long axis of the disc, its pole, its short axis).
+Grid size: 320x16x320
+Volume bounds: [-24.479999999999997, -0.5, -24.479999999999997] to [24.479999999999997, 0.5, 24.479999999999997]
+# Bounds are in kpc: sizePc 1000, gamma 2.

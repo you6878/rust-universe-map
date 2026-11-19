@@ -1,0 +1,6 @@
+# Made by tools/photo_plane.py from M31.jpg: the disc as from above, rows along its long axis, columns along its short one.
+Plane size: 1280x1280
+Half width kpc: 24.479999999999997
+# Where the photograph has the galaxy (for comparing with it): its middle and its scale.
+Photograph middle px: 511 539
+Photograph kpc per px: 0.041833954467630316

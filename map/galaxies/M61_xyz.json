@@ -1,0 +1,31 @@
+{
+ "name": "M61",
+ "size": 1024,
+ "stars": 172306833236.1497,
+ "views": {
+  "y": "M61_xyz_y.png",
+  "x": "M61_xyz_x.png",
+  "z": "M61_xyz_z.png"
+ },
+ "frame": {
+  "kpcPerPx": 0.01783633038750883,
+  "middlePx": {
+   "col": 511.28,
+   "row": 511.28
+  },
+  "wAxis": [
+   0.44275732241244886,
+   -0.896641485461251
+  ],
+  "uAxis": [
+   0.896641485461251,
+   0.44275732241244886
+  ],
+  "likePhotograph": 0.9650988484196616
+ },
+ "about": "a galaxy from three views (tools/galaxy_xyz.py), size x size pixels each, kpcPerPx a pixel: y seen from above, rows +U, columns +W; x seen along U, columns +W, rows -Y; z seen along W, columns +U, rows -Y (Y up, out of the disc). In the galaxy's own frame (fitted.json: X its long axis, Z its short one, parsecs from its middle) a place is at W = X wAxis[0] + Z wAxis[1], U = X uAxis[0] + Z uAxis[1], so at column middlePx.col + W / kpcPerPx, row middlePx.row + U / kpcPerPx of the views. Light is sRGB^2.2.",
+ "bulgePx": {
+  "col": 514.0203165254229,
+  "row": 496.01590519106713
+ }
+}

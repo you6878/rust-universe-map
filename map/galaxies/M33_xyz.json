@@ -1,0 +1,31 @@
+{
+ "name": "Triangulum spiral",
+ "size": 1024,
+ "stars": 37745142811.11756,
+ "views": {
+  "y": "M33_xyz_y.png",
+  "x": "M33_xyz_x.png",
+  "z": "M33_xyz_z.png"
+ },
+ "frame": {
+  "kpcPerPx": 0.015964034936775878,
+  "middlePx": {
+   "col": 512.28,
+   "row": 513.28
+  },
+  "wAxis": [
+   0.36229696948110346,
+   -0.9320627156499762
+  ],
+  "uAxis": [
+   0.9320627156499762,
+   0.36229696948110346
+  ],
+  "likePhotograph": 0.9189258686514618
+ },
+ "about": "a galaxy from three views (tools/galaxy_xyz.py), size x size pixels each, kpcPerPx a pixel: y seen from above, rows +U, columns +W; x seen along U, columns +W, rows -Y; z seen along W, columns +U, rows -Y (Y up, out of the disc). In the galaxy's own frame (fitted.json: X its long axis, Z its short one, parsecs from its middle) a place is at W = X wAxis[0] + Z wAxis[1], U = X uAxis[0] + Z uAxis[1], so at column middlePx.col + W / kpcPerPx, row middlePx.row + U / kpcPerPx of the views. Light is sRGB^2.2.",
+ "bulgePx": {
+  "col": 511.17355817811904,
+  "row": 509.97246592375325
+ }
+}

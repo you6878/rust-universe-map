@@ -1,0 +1,31 @@
+{
+ "name": "Whirlpool Galaxy",
+ "size": 1024,
+ "stars": 172306833236.1497,
+ "views": {
+  "y": "M51_xyz_y.png",
+  "x": "M51_xyz_x.png",
+  "z": "M51_xyz_z.png"
+ },
+ "frame": {
+  "kpcPerPx": 0.02075538175115902,
+  "middlePx": {
+   "col": 517.28,
+   "row": 545.28
+  },
+  "wAxis": [
+   0.6054839966742855,
+   -0.7958574808163417
+  ],
+  "uAxis": [
+   0.7958574808163417,
+   0.6054839966742855
+  ],
+  "likePhotograph": 0.6084512321129637
+ },
+ "about": "a galaxy from three views (tools/galaxy_xyz.py), size x size pixels each, kpcPerPx a pixel: y seen from above, rows +U, columns +W; x seen along U, columns +W, rows -Y; z seen along W, columns +U, rows -Y (Y up, out of the disc). In the galaxy's own frame (fitted.json: X its long axis, Z its short one, parsecs from its middle) a place is at W = X wAxis[0] + Z wAxis[1], U = X uAxis[0] + Z uAxis[1], so at column middlePx.col + W / kpcPerPx, row middlePx.row + U / kpcPerPx of the views. Light is sRGB^2.2.",
+ "bulgePx": {
+  "col": 510.839549550771,
+  "row": 550.5299487645985
+ }
+}

@@ -1,0 +1,247 @@
+{
+ "name": "Milky Way",
+ "size": 1024,
+ "stars": 360000000000.0,
+ "views": {
+  "y": "MW_xyz_y.png",
+  "x": "MW_xyz_x.png",
+  "z": "MW_xyz_z.png"
+ },
+ "frame": {
+  "kpcPerPx": 0.0390625,
+  "middlePx": {
+   "col": 511.5,
+   "row": 511.5
+  },
+  "wAxis": [
+   1.0,
+   0.0
+  ],
+  "uAxis": [
+   0.0,
+   1.0
+  ],
+  "likePhotograph": null
+ },
+ "about": "a galaxy from three views (tools/galaxy_xyz.py), size x size pixels each, kpcPerPx a pixel: y seen from above, rows +U, columns +W; x seen along U, columns +W, rows -Y; z seen along W, columns +U, rows -Y (Y up, out of the disc). In the galaxy's own frame (fitted.json: X its long axis, Z its short one, parsecs from its middle) a place is at W = X wAxis[0] + Z wAxis[1], U = X uAxis[0] + Z uAxis[1], so at column middlePx.col + W / kpcPerPx, row middlePx.row + U / kpcPerPx of the views. Light is sRGB^2.2.",
+ "bulgePx": {
+  "col": 511.5,
+  "row": 511.5
+ },
+ "light": {
+  "files": {
+   "y": "MW_xyz_y_light.png",
+   "x": "MW_xyz_x_light.png",
+   "z": "MW_xyz_z_light.png"
+  },
+  "log10Range": [
+   -12.821360916173186,
+   -0.06691353834316907
+  ],
+  "profile": {
+   "name": "Milky Way",
+   "tiltDeg": 0.0,
+   "source": "the Milky Way model of universe.json starField (an exponential disc of localDensity 0.14 systems/pc\u00b3 at 8 kpc, scale length 2.1 kpc, height 350 pc, ending 16-20 kpc, and its bulge), its stars per pc\u00b2 seen from above as a magnitude (25 - 2.5 log10): only the shape matters, the total is set by the stars at the Sun; byRadius: each ring of the map made as bright as this on average (tools/galaxy_xyz.py)",
+   "table": [
+    [
+     0.02,
+     13.584
+    ],
+    [
+     0.0285,
+     13.584
+    ],
+    [
+     0.0407,
+     13.586
+    ],
+    [
+     0.0581,
+     13.588
+    ],
+    [
+     0.083,
+     13.592
+    ],
+    [
+     0.1184,
+     13.599
+    ],
+    [
+     0.1689,
+     13.611
+    ],
+    [
+     0.2411,
+     13.635
+    ],
+    [
+     0.3441,
+     13.682
+    ],
+    [
+     0.491,
+     13.772
+    ],
+    [
+     0.7007,
+     13.951
+    ],
+    [
+     1.0,
+     14.305
+    ],
+    [
+     1.5,
+     15.117
+    ],
+    [
+     2.0,
+     16.072
+    ],
+    [
+     2.5,
+     16.881
+    ],
+    [
+     3.0,
+     17.374
+    ],
+    [
+     3.5,
+     17.687
+    ],
+    [
+     4.0,
+     17.953
+    ],
+    [
+     4.5,
+     18.212
+    ],
+    [
+     5.0,
+     18.471
+    ],
+    [
+     5.5,
+     18.729
+    ],
+    [
+     6.0,
+     18.988
+    ],
+    [
+     6.5,
+     19.246
+    ],
+    [
+     7.0,
+     19.505
+    ],
+    [
+     7.5,
+     19.763
+    ],
+    [
+     8.0,
+     20.022
+    ],
+    [
+     8.5,
+     20.28
+    ],
+    [
+     9.0,
+     20.539
+    ],
+    [
+     9.5,
+     20.797
+    ],
+    [
+     10.0,
+     21.056
+    ],
+    [
+     10.5,
+     21.314
+    ],
+    [
+     11.0,
+     21.573
+    ],
+    [
+     11.5,
+     21.831
+    ],
+    [
+     12.0,
+     22.09
+    ],
+    [
+     12.5,
+     22.349
+    ],
+    [
+     13.0,
+     22.607
+    ],
+    [
+     13.5,
+     22.866
+    ],
+    [
+     14.0,
+     23.124
+    ],
+    [
+     14.5,
+     23.383
+    ],
+    [
+     15.0,
+     23.641
+    ],
+    [
+     15.5,
+     23.9
+    ],
+    [
+     16.0,
+     24.158
+    ],
+    [
+     16.5,
+     24.562
+    ],
+    [
+     17.0,
+     24.987
+    ],
+    [
+     17.5,
+     25.444
+    ],
+    [
+     18.0,
+     25.945
+    ],
+    [
+     18.5,
+     26.516
+    ],
+    [
+     19.0,
+     27.214
+    ],
+    [
+     19.5,
+     28.225
+    ]
+   ],
+   "byRadius": true
+  },
+  "about": "the light put back (tools/galaxy_xyz.py --profile): 16-bit, 0 none, else log10(light) = lo + (v - 1) / 65534 (hi - lo)"
+ }
+}

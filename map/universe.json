@@ -1,0 +1,806 @@
+{
+  "about": "The map of the universe the viewer draws. Every layer is listed here with the files it is made of. Paths: '$data' is the data folder below, '~' the home folder, anything else is relative to this file. A '*' stands for a quality suffix (-high, -med, -low); the best one installed is used. Edit the files or the numbers and run the viewer again.",
+  "data": "~/.gaiasky/data",
+  "stars": {
+    "catalogs": [
+      "$data/catalog-gaia-dr3-best/catalog/gaia-dr3-best/particles/particles_000000.bin"
+    ]
+  },
+  "starField": {
+    "about": "Systems of stars for the rest of the galaxy, computed where the camera is from this model: 270 billion systems, which with their companions are about 360 billion stars, most of them faint dwarfs. Lengths in parsecs; positions in galactic axes with the Sun at the origin, +Z to the galactic centre, +Y to the galactic north. Remove this block to have only the catalog stars.",
+    "seed": 1,
+    "photoAbout": "The Milky Way's own stars spread by three pictures (tools/galaxy_xyz.py, viewer/src/photo_volume.rs) instead of the disc, arms and bulge below: seen from above, R. Hurt's map (NASA/JPL-Caltech/ESO, eso1339g, map/photos/MW_hurt_eso1339g.jpg) cut 40 kpc wide round the centre; seen edge on along its two axes, made by the image model from it and the sky's panorama. The light of each ring of the map as the formula below says (galaxies/MW_profile.json, byRadius); the thickness as drawn: the stars fall to 1/e 330 pc from the plane at the Sun, as measured (300-350). Scaled so that within 500 pc of the Sun in the plane there are localDensity systems per pc3. The catalog keeps the stars seen from the Earth brighter than magnitude 9.5 (procedural.rs CATALOG_MAG). Remove 'photo' for the formula.",
+    "photo": "galaxies/MW_xyz.json",
+    "thickDiscAbout": "The thick disc, which the edge views do not have: 'share' of each column's stars spread in height as exp(-|y|/heightPc). Juric et al. 2008 (ApJ 673, 864): thin disc 300 pc, thick 900 pc, the thick 12% of the thin in the plane at the Sun, so 0.12*900/(300+0.12*900) = 26% of a column.",
+    "thickDisc": {
+      "share": 0.26,
+      "heightPc": 900
+    },
+    "centrePc": [
+      0,
+      0,
+      8000
+    ],
+    "localDensity": 0.14,
+    "discScaleLengthPc": 2100,
+    "discScaleHeightPc": 350,
+    "discEdgePc": [
+      16000,
+      20000
+    ],
+    "arms": {
+      "count": 2,
+      "strength": 0.7,
+      "pitch": 0.23,
+      "startPc": 3000
+    },
+    "bulge": {
+      "density": 21.6,
+      "radiusPc": 1200,
+      "flattening": 2.0
+    },
+    "brightnessAbout": "How bright the stars are: [absolute magnitude, share of all stars brighter than it], from bright to faint, the last share 1. The rows are where the spectral classes O, B, A, F, G, K, M end on the main sequence, with the shares of the classes near the Sun; 'whiteDwarfShare' of the stars are white dwarfs. Sources: SOURCES.md next to this file.",
+    "brightness": [
+      [
+        -7.0,
+        1e-10
+      ],
+      [
+        -3.9,
+        3e-07
+      ],
+      [
+        0.99,
+        0.0012
+      ],
+      [
+        2.57,
+        0.0073
+      ],
+      [
+        4.48,
+        0.0373
+      ],
+      [
+        5.78,
+        0.1133
+      ],
+      [
+        8.8,
+        0.2333
+      ],
+      [
+        19.75,
+        1.0
+      ]
+    ],
+    "whiteDwarfShare": 0.025,
+    "companionsAbout": "How often stars have companions: rows of [least mass of the first star in solar masses, share of systems with two stars, with three, with four or more], lightest first. Sources: SOURCES.md.",
+    "companions": [
+      [
+        0.0,
+        0.2,
+        0.03,
+        0.003
+      ],
+      [
+        0.57,
+        0.33,
+        0.08,
+        0.03
+      ],
+      [
+        1.61,
+        0.43,
+        0.18,
+        0.07
+      ],
+      [
+        3.0,
+        0.45,
+        0.25,
+        0.11
+      ],
+      [
+        8.0,
+        0.36,
+        0.35,
+        0.22
+      ],
+      [
+        17.7,
+        0.28,
+        0.4,
+        0.28
+      ]
+    ],
+    "planets": {
+      "about": "How many planets the stars have: the mean number per star (a choice within what the surveys allow), the share of stars of one solar mass and the Sun's metals with a giant planet (it grows with the mass and the metals of the star), and the share of those giants that are hot Jupiters. Sources: SOURCES.md.",
+      "meanPerStar": 4.5,
+      "giantsAtOneSolarMass": 0.07,
+      "hotShareOfGiants": 0.15
+    },
+    "galaxiesAbout": "Other galaxies made of stars, as the Milky Way above: their stars are computed where the camera is, spread as the light of a volume of this map (one made from a photograph by tools/photo_galaxy.py), so no star is stored. 'systems' is how many there are in all: Andromeda has about a trillion stars, 7.5e11 systems with their companions. 'bulgeShare' of them are put in a round bulge of 'bulgeRadiusPc' instead of the grid. Andromeda has none: its face-on map is fitted to the photograph, bulge and all. The brightness table is the one above. 'absMag' is how bright the whole galaxy is (Andromeda: about -21.5), for the glow of the stars too faint to draw one by one. 'plane' is a face-on map of the disc made from the same photograph by tools/photo_plane.py, finer than the grid and with its dust lanes, and fitted so that its stars seen from the Earth look like the photograph: within each cell of the grid the stars are spread as it has them.",
+    "galaxies": [
+      {
+        "name": "Andromeda",
+        "photo": "galaxies/M31_xyz.json",
+        "look": "Andromeda Galaxy",
+        "systems": 750000000000.0,
+        "absMag": -21.5,
+        "about": "its stars spread by three pictures, one along each of its axes (tools/galaxy_xyz.py, viewer/src/photo_volume.rs), laid where starField.fitted's Andromeda Galaxy is; before, the grid of the volume \"Andromeda, light\" with the plane grids/andromeda_plane.png"
+      },
+      {
+        "name": "Large Magellanic Cloud",
+        "photo": "galaxies/LMC_xyz.json",
+        "look": "Large Magellanic Cloud",
+        "systems": 13973454104.339518,
+        "absMag": -17.584850021680094,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "Small Magellanic Cloud",
+        "photo": "galaxies/SMC_xyz.json",
+        "look": "Small Magellanic Cloud",
+        "systems": 3869601697.779996,
+        "absMag": -16.19075625191822,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "Triangulum spiral",
+        "photo": "galaxies/M33_xyz.json",
+        "look": "Triangulum spiral",
+        "systems": 28308857108.33817,
+        "absMag": -18.351396430309407,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "Whirlpool Galaxy",
+        "photo": "galaxies/M51_xyz.json",
+        "look": "Whirlpool Galaxy",
+        "systems": 129230124927.11227,
+        "absMag": -20.0,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "M58",
+        "photo": "galaxies/M58_xyz.json",
+        "look": "M58",
+        "systems": 129230124927.11227,
+        "absMag": -20.0,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back); catalog-nbg's right ascension is off by degrees: placed by tools/galaxy_fit.py --radec (M58 189.4313, M61 185.4788)"
+      },
+      {
+        "name": "M61",
+        "photo": "galaxies/M61_xyz.json",
+        "look": "M61",
+        "systems": 129230124927.11227,
+        "absMag": -20.0,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back); catalog-nbg's right ascension is off by degrees: placed by tools/galaxy_fit.py --radec (M58 189.4313, M61 185.4788)"
+      },
+      {
+        "name": "Bode's Galaxy",
+        "photo": "galaxies/M81_xyz.json",
+        "look": "Bode's Galaxy",
+        "systems": 130369804489.18,
+        "absMag": -20.009533125180564,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "M82",
+        "photo": "galaxies/M82_xyz.json",
+        "look": "M82",
+        "systems": 38274821583.97642,
+        "absMag": -18.678873526939114,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "Surfboard Galaxy",
+        "photo": "galaxies/M108_xyz.json",
+        "look": "Surfboard Galaxy",
+        "systems": 67086348410.27705,
+        "absMag": -19.28817597298775,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "Vacuum Cleaner Galaxy",
+        "photo": "galaxies/M109_xyz.json",
+        "look": "Vacuum Cleaner Galaxy",
+        "systems": 129230124927.11227,
+        "absMag": -20.0,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "NGC 2403",
+        "photo": "galaxies/NGC2403_xyz.json",
+        "look": "NGC 2403",
+        "systems": 39465535871.76599,
+        "absMag": -18.712135599922163,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "M65",
+        "photo": "galaxies/NGC3623_xyz.json",
+        "look": "M65",
+        "systems": 129230124927.11227,
+        "absMag": -20.0,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph, map/photos/M65_photo.jpg from SDSS), laid where starField.fitted's galaxy of this name is; the light as drawn. catalog-nbg has its right ascension in hours (11.315) and a close-up crop as its picture: fitted.json has it from tools/galaxy_fit.py --radec M65=169.7330,13.0922 --core-only M65"
+      },
+      {
+        "name": "Pinwheel Galaxy",
+        "photo": "galaxies/M101_xyz.json",
+        "look": "Pinwheel Galaxy",
+        "systems": 355929319410.23016,
+        "absMag": -21.1,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph, map/photos/M101_photo.jpg from SDSS), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "Sombrero Galaxy",
+        "photo": "galaxies/M104_xyz.json",
+        "look": "Sombrero Galaxy",
+        "systems": 678209336507.5867,
+        "absMag": -21.8,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph, map/photos/M104_photo.jpg from DSS2 (POSS-II/UKSTU) blue, red and infrared plates), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "Southern Pinwheel Galaxy",
+        "photo": "galaxies/M83_xyz.json",
+        "look": "Southern Pinwheel Galaxy",
+        "systems": 224576218197.7213,
+        "absMag": -20.6,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph, map/photos/M83_photo.jpg from DSS2 (POSS-II/UKSTU) blue, red and infrared plates), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "M106",
+        "photo": "galaxies/M106_xyz.json",
+        "look": "M106",
+        "systems": 390268738101.3999,
+        "absMag": -21.2,
+        "about": "its stars spread by three pictures (tools/galaxy_xyz.py --photo, the views made by the image model from its photograph, map/photos/M106_photo.jpg from SDSS), laid where starField.fitted's galaxy of this name is; the light as drawn (no measured profile put back)"
+      },
+      {
+        "name": "Milky Way",
+        "photo": "galaxies/MW_xyz.json",
+        "look": "Milky Way",
+        "systems": 229000000000.0,
+        "absMag": -20.8,
+        "lightOnly": true,
+        "dust": "Milky Way, dust",
+        "dustAbout": "its voxels' light dimmed by the volume 'Milky Way, dust' (godot galaxy_voxels.gdshader): the brown lanes of the same Hurt map as its top picture and dust spread over the disc, 90 pc thick (tools/make_galaxy.py); none within about 1 kpc of the Sun, where the measured dust map is",
+        "about": "its light only (galaxy_look.gd: its disc from afar, its voxels inside, but not within 1-2 kpc of the Sun, where the sky is the real one): its stars are starField.photo's (procedural.rs HomeVolume), not counted here"
+      }
+    ],
+    "fittedAbout": "Galaxies made from two pictures each (face on and edge on) as matrices: those with a photograph (galaxies/fitted.json: the photograph stretched face on and upscaled; tools/galaxy_views.py) and those without, imagined from the catalog's numbers (galaxies/imagined.json; tools/galaxy_imagine.py). Their stars are computed around the camera as for the others. A galaxy that has a grid above (Andromeda) is made from its grid instead.",
+    "fitted": [
+      "galaxies/fitted.json",
+      "galaxies/imagined.json",
+      "galaxies/milky_way.json"
+    ]
+  },
+  "planetStyles": {
+    "about": "What made-up planets are like up close: named styles, each a set of parameters after a planet of the solar system, used for every planet of its kind around every star and varied a little for each one (tints, how much sea, how high the mountains). The ground itself is computed from the planet's own number. reliefKm: highest ground over lowest on a planet the size of the Earth; sea: share of the height range under water (0: dry); roughness: how many times the main shapes repeat around the planet; mountains: 0 to 1; iceCap: sine of the latitude where the ice begins (over 1: none); clouds: share of the sky; glow: molten rock in the low ground; low, mid, high: colors of lowland, upland and peaks; airKm: depth of the air on a planet the size of the Earth; bands, contrast: of a planet of gas. detailKm: with measured heights, how high the computed small shapes between the measured points are. life: 1 if plants grow wherever the climate lets them (then forest, grass, sand, rock are the colors of the land, and snow lies where it is cold enough), 0 for a bare planet (colored by height with low, mid, high). tempEquatorC, tempPoleC: mean temperature at sea level, tempPower: how sharply it gets colder towards the poles (these, the colors of the land and the rain model of the shader were fitted to a cloudless picture of the Earth by tools/fit_climate.py); lapseCPerKm: colder by this much each km up; rain: how wet the planet is (1: the Earth). cloudKm: height of the clouds. airThickness: share of the starlight the air scatters on the way straight down, for the color it scatters most; air: the shares of red, green and blue it scatters.",
+    "styles": {
+      "earth": {
+        "after": "the Earth: seas, green and dry land, ice caps, clouds, blue air; for rocky planets in the habitable zone",
+        "reliefKm": 20.0,
+        "sea": 0.55,
+        "detailKm": 0.5,
+        "life": 1.0,
+        "forest": [
+          0.17,
+          0.26,
+          0.09
+        ],
+        "grass": [
+          0.5,
+          0.34,
+          0.26
+        ],
+        "sand": [
+          0.7,
+          0.57,
+          0.41
+        ],
+        "rock": [
+          0.42,
+          0.41,
+          0.5
+        ],
+        "tempEquatorC": 32.5,
+        "tempPoleC": -14.2,
+        "tempPower": 3.27,
+        "lapseCPerKm": 6.5,
+        "rain": 1.0,
+        "cloudKm": 5.0,
+        "airThickness": 0.27,
+        "roughness": 2.2,
+        "mountains": 0.9,
+        "iceCap": 0.86,
+        "clouds": 0.5,
+        "glow": 0.0,
+        "low": [
+          0.16,
+          0.36,
+          0.12
+        ],
+        "mid": [
+          0.45,
+          0.38,
+          0.24
+        ],
+        "high": [
+          0.95,
+          0.95,
+          0.97
+        ],
+        "seaColor": [
+          0.02,
+          0.05,
+          0.125
+        ],
+        "air": [
+          0.175,
+          0.41,
+          1.0
+        ],
+        "airKm": 100.0,
+        "bands": 0.0,
+        "contrast": 0.0
+      },
+      "mars": {
+        "after": "Mars: dry red ground, small ice caps, thin dusty air; for rocky planets outside the habitable zone",
+        "reliefKm": 30.0,
+        "sea": 0.0,
+        "roughness": 2.6,
+        "mountains": 0.7,
+        "iceCap": 0.93,
+        "clouds": 0.03,
+        "glow": 0.0,
+        "low": [
+          0.62,
+          0.3,
+          0.16
+        ],
+        "mid": [
+          0.72,
+          0.42,
+          0.25
+        ],
+        "high": [
+          0.86,
+          0.66,
+          0.5
+        ],
+        "seaColor": [
+          0,
+          0,
+          0
+        ],
+        "air": [
+          0.85,
+          0.62,
+          0.45
+        ],
+        "airKm": 40.0,
+        "bands": 0.0,
+        "contrast": 0.0
+      },
+      "moon": {
+        "after": "the Moon: grey rock and no air; for small rocky planets",
+        "reliefKm": 16.0,
+        "sea": 0.0,
+        "roughness": 3.4,
+        "mountains": 0.4,
+        "iceCap": 2.0,
+        "clouds": 0.0,
+        "glow": 0.0,
+        "low": [
+          0.3,
+          0.3,
+          0.31
+        ],
+        "mid": [
+          0.5,
+          0.49,
+          0.47
+        ],
+        "high": [
+          0.72,
+          0.71,
+          0.69
+        ],
+        "seaColor": [
+          0,
+          0,
+          0
+        ],
+        "air": [
+          0,
+          0,
+          0
+        ],
+        "airKm": 0.0,
+        "bands": 0.0,
+        "contrast": 0.0
+      },
+      "europa": {
+        "after": "Europa: smooth ice; for icy planets",
+        "reliefKm": 4.0,
+        "sea": 0.0,
+        "roughness": 3.0,
+        "mountains": 0.25,
+        "iceCap": 2.0,
+        "clouds": 0.0,
+        "glow": 0.0,
+        "low": [
+          0.74,
+          0.8,
+          0.88
+        ],
+        "mid": [
+          0.9,
+          0.93,
+          0.97
+        ],
+        "high": [
+          0.99,
+          0.99,
+          1.0
+        ],
+        "seaColor": [
+          0,
+          0,
+          0
+        ],
+        "air": [
+          0,
+          0,
+          0
+        ],
+        "airKm": 0.0,
+        "bands": 0.0,
+        "contrast": 0.0
+      },
+      "lava": {
+        "after": "no planet of the solar system: dark crust with molten rock in the low ground; for planets hotter than 1000 K",
+        "reliefKm": 12.0,
+        "sea": 0.0,
+        "roughness": 2.8,
+        "mountains": 0.6,
+        "iceCap": 2.0,
+        "clouds": 0.0,
+        "glow": 1.0,
+        "low": [
+          0.1,
+          0.06,
+          0.05
+        ],
+        "mid": [
+          0.2,
+          0.13,
+          0.1
+        ],
+        "high": [
+          0.32,
+          0.25,
+          0.22
+        ],
+        "seaColor": [
+          0,
+          0,
+          0
+        ],
+        "air": [
+          0.6,
+          0.3,
+          0.2
+        ],
+        "airKm": 30.0,
+        "bands": 0.0,
+        "contrast": 0.0
+      },
+      "jupiter": {
+        "after": "Jupiter: bands of cloud (low: dark bands, mid: light bands, high: the storm), no ground, a station over the clouds; for gas giants",
+        "reliefKm": 0.0,
+        "sea": 0.0,
+        "roughness": 1.0,
+        "mountains": 0.0,
+        "iceCap": 2.0,
+        "clouds": 0.0,
+        "glow": 0.0,
+        "low": [
+          0.55,
+          0.4,
+          0.28
+        ],
+        "mid": [
+          0.9,
+          0.82,
+          0.68
+        ],
+        "high": [
+          0.72,
+          0.3,
+          0.18
+        ],
+        "seaColor": [
+          0,
+          0,
+          0
+        ],
+        "air": [
+          0.85,
+          0.75,
+          0.6
+        ],
+        "airKm": 600.0,
+        "bands": 17.0,
+        "contrast": 0.6
+      },
+      "neptune": {
+        "after": "Neptune: smooth blue air with faint bands, no ground, a station; for ice giants and sub-Neptunes",
+        "reliefKm": 0.0,
+        "sea": 0.0,
+        "roughness": 1.0,
+        "mountains": 0.0,
+        "iceCap": 2.0,
+        "clouds": 0.0,
+        "glow": 0.0,
+        "low": [
+          0.25,
+          0.42,
+          0.85
+        ],
+        "mid": [
+          0.4,
+          0.6,
+          0.95
+        ],
+        "high": [
+          0.85,
+          0.92,
+          1.0
+        ],
+        "seaColor": [
+          0,
+          0,
+          0
+        ],
+        "air": [
+          0.45,
+          0.65,
+          0.95
+        ],
+        "airKm": 400.0,
+        "bands": 7.0,
+        "contrast": 0.9
+      }
+    }
+  },
+  "rare": {
+    "about": "Objects that are not ordinary stars, each kind a layer of its own spread like the stars: its name, and how many the galaxy has ('total') or how many for each star ('perStar'). 'viewer --nearest KIND' finds the nearest ones. Sources and what is not verified: SOURCES.md.",
+    "classes": [
+      {
+        "name": "neutron star",
+        "total": 1000000000.0
+      },
+      {
+        "name": "black hole",
+        "total": 100000000.0
+      },
+      {
+        "name": "radio pulsar",
+        "total": 30000,
+        "note": "those beamed towards the Earth; the total is not verified"
+      },
+      {
+        "name": "magnetar",
+        "total": 30,
+        "note": "the ones known"
+      },
+      {
+        "name": "x-ray binary",
+        "total": 350,
+        "note": "the ones catalogued"
+      },
+      {
+        "name": "hypervelocity star",
+        "total": 1000
+      },
+      {
+        "name": "brown dwarf",
+        "perStar": 0.1667
+      },
+      {
+        "name": "free-floating planet",
+        "perStar": 21
+      }
+    ]
+  },
+  "volumes": [
+    {
+      "about": "Gas, starlight and dust as grids of voxels (RGBA bytes, gzipped): 'light' shines, 'dust' blocks; a volume may have only one of them. RGB is the color and A the density, raised to the power 'gamma'. The metadata file gives the grid size and the box it fills, in units of sizePc. The box is centred on centrePc, with its axes along the galactic ones, or along the three directions of 'axes' (galactic) for a volume that is turned, such as another galaxy. A kiloparsec of full density adds lightPerKpc of brightness, has an optical depth of dustPerKpc, and its dust gives back dustGlowPerKpc of brightness. Up to six volumes; the dust of one dims the light of all.",
+      "name": "Milky Way, light",
+      "note": "From the face-on map of the Milky Way by R. Hurt (NASA/JPL-Caltech/ESO), spread in height by a model. Made by tools/make_galaxy.py.",
+      "light": "grids/mw_light.raw.gz",
+      "metadata": "grids/mw_light_metadata.txt",
+      "sizePc": 1000,
+      "centrePc": [
+        0,
+        0,
+        8000
+      ],
+      "gamma": 2,
+      "lightPerKpc": 0.3761
+    },
+    {
+      "name": "Milky Way, dust",
+      "note": "The dust lanes of the same picture, in a thin layer. Leaves out the surroundings of the Sun.",
+      "dust": "grids/mw_dust.raw.gz",
+      "metadata": "grids/mw_dust_metadata.txt",
+      "sizePc": 1000,
+      "centrePc": [
+        0,
+        0,
+        8000
+      ],
+      "gamma": 2,
+      "dustPerKpc": 6.1,
+      "dustGlowPerKpc": 0.02,
+      "detailPc": 400,
+      "detailStrength": 1.0
+    },
+    {
+      "name": "Dust around the Sun",
+      "note": "Measured: Edenhofer et al. (2023), https://doi.org/10.5281/zenodo.8187943, CC BY 4.0, from 69 pc to 1.25 kpc. Converted by tools/dust_edenhofer.py; dustPerKpc is the real optical depth in visible light.",
+      "dust": "grids/local_dust_measured.raw.gz",
+      "metadata": "grids/local_dust_measured_metadata.txt",
+      "sizePc": 1,
+      "centrePc": [
+        0,
+        0,
+        0
+      ],
+      "gamma": 2,
+      "dustPerKpc": 18.0,
+      "dustGlowPerKpc": 0.0
+    },
+    {
+      "name": "Sky of the Earth",
+      "note": "Dust and light added around the Sun by tools/match_panorama.py so that the sky of the Earth is the Milky Way panorama of Gaia Sky. The panorama has no distances, so these are right only as seen from near the Sun: 'fadeOutPc' gives the distances of the camera from the centre between which the volume fades away.",
+      "light": "grids/sky_light.raw.gz",
+      "dust": "grids/sky_dust.raw.gz",
+      "metadata": "grids/sky_metadata.txt",
+      "sizePc": 1,
+      "centrePc": [
+        0,
+        0,
+        0
+      ],
+      "gamma": 2,
+      "lightPerKpc": 17.63,
+      "dustPerKpc": 22.4,
+      "dustGlowPerKpc": 0.0,
+      "fadeOutPc": [
+        200,
+        1000
+      ]
+    },
+    {
+      "name": "Andromeda, light",
+      "note": "Made by tools/photo_galaxy.py from the photograph M31.jpg: its ellipse stretched into a disc, tilted by 68 degrees. Which half is nearer and the roundness of the bulge are not in a photograph. Its brightness is set by hand, well above what the same rule gives for the Milky Way, so that it shows through the glow of our own galaxy as it does in photographs.",
+      "light": "grids/andromeda_light.raw.gz",
+      "metadata": "grids/andromeda_light_metadata.txt",
+      "sizePc": 1000,
+      "centrePc": [
+        618999.9,
+        -286050.0,
+        -374564.4
+      ],
+      "axes": [
+        [
+          0.145672,
+          -0.655305,
+          0.741184
+        ],
+        [
+          0.839385,
+          0.478403,
+          0.257999
+        ],
+        [
+          0.523654,
+          -0.584555,
+          -0.619743
+        ]
+      ],
+      "gamma": 2,
+      "lightPerKpc": 0.5,
+      "whiteBalance": false
+    },
+    {
+      "name": "Andromeda, dust",
+      "dust": "grids/andromeda_dust.raw.gz",
+      "metadata": "grids/andromeda_dust_metadata.txt",
+      "sizePc": 1000,
+      "centrePc": [
+        618999.9,
+        -286050.0,
+        -374564.4
+      ],
+      "axes": [
+        [
+          0.145672,
+          -0.655305,
+          0.741184
+        ],
+        [
+          0.839385,
+          0.478403,
+          0.257999
+        ],
+        [
+          0.523654,
+          -0.584555,
+          -0.619743
+        ]
+      ],
+      "gamma": 2,
+      "dustPerKpc": 10.56,
+      "dustGlowPerKpc": 0.02,
+      "detailPc": 400,
+      "detailStrength": 1.0,
+      "whiteBalance": false
+    }
+  ],
+  "detail": {
+    "about": "Clumps finer than the voxels, for the dust of a volume that asks for them with 'detailStrength': a cube of noise that repeats (one byte a cell), read every 'detailPc' parsecs of that volume. The measured dust around the Sun has clumps a few parsecs across; this gives the dust of the model the same grain. Made by tools/make_galaxy.py.",
+    "noise": "grids/detail.raw.gz"
+  },
+  "exposure": {
+    "about": "The camera adapts to how bright the volumes are around it: seen from outside, the disc of a galaxy is as faint as the sky far from the Milky Way is from here. At 'atPc' (galactic parsecs) the exposure is 1; elsewhere it is what gives the same brightness, between 'min' and 'max'. Remove this block for an exposure of 1 everywhere. 'whiteBalance' is what the camera multiplies red, green and blue by at that place, so that the sky there has the colors of the panorama (the picture of the galaxy from above is bluer); between the two distances of 'whiteBalanceFadePc' from it, it goes back to none. A narrow view gathers light like a telescope: below 'zoomFromFovDeg' (the field of view from top to bottom) the exposure grows as the view narrows, up to 'zoomMax' times, so that faint things such as other galaxies show when zoomed in on. Zoomed in, the glow of the galaxy the camera is in is taken off as well, as the sky background is in a photograph.",
+    "atPc": [
+      0,
+      0,
+      0
+    ],
+    "min": 0.5,
+    "max": 20,
+    "whiteBalance": [
+      1.25,
+      1.0,
+      0.66
+    ],
+    "whiteBalanceFadePc": [
+      1500,
+      5000
+    ],
+    "zoomFromFovDeg": 40,
+    "zoomMax": 30
+  },
+  "bodies": {
+    "planets": "$data/default-data/planets.json",
+    "moons": "$data/default-data/moons.json",
+    "vsop87": "$data/default-data/vsop87/vsop87a.bin",
+    "planetObjects": {
+      "about": "Bodies of the Solar System that are drawn by the planet object, the same one that draws the made-up planets: 'style' is one of planetStyles; 'terrain' are measured heights written by tools/make_terrain.py (<name>.i16.gz with <name>_metadata.txt), in place of computed ground. Sea, forests, air and clouds are computed from the style.",
+      "Earth": {
+        "style": "earth",
+        "terrain": "grids/earth_height"
+      }
+    },
+    "earth": {
+      "day": "$data/default-data/tex/cubemap/earth-day*",
+      "night": "$data/default-data/tex/cubemap/earth-night*",
+      "clouds": "$data/default-data/tex/cubemap/earth-cloud*"
+    }
+  },
+  "pictures": {
+    "about": "Galaxies and nebulae that are a picture standing in space. A picture with a longer side than 'maxSidePx' pixels is made smaller when it is read, to save graphics memory; remove it to keep them whole.",
+    "catalogs": [
+      "$data/catalog-nbg/particles-nbg.json",
+      "$data/catalog-nebulae/particles-nebulae.json"
+    ],
+    "maxSidePx": 1024
+  }
+}

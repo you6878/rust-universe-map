@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>@NAME@ 복셀 큐브</title>
+<style>
+  :root { --bg: #0b0c10; --panel: #15171d; --line: #2a2d36; --text: #e8e6e1; --dim: #9a978f; --accent: #f0c27a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 -apple-system, "Apple SD Gothic Neo", sans-serif; }
+  header { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  header h1 { margin: 0; font-size: 17px; }
+  header p { margin: 2px 0 0; color: var(--dim); font-size: 12px; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; padding: 16px; }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+  .panel h2 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
+  .panel h2 small { color: var(--dim); font-weight: 400; }
+  #cube { width: 100%; max-width: 760px; aspect-ratio: 1; display: block; margin: 0 auto; background: #000; border-radius: 4px; cursor: grab; }
+  .slices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+  .slices canvas, .pics canvas { width: 100%; aspect-ratio: 1; display: block; background: #000; border-radius: 4px; image-rendering: pixelated; }
+  .pics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+  .pics canvas { cursor: crosshair; image-rendering: auto; }
+  aside { display: grid; gap: 12px; align-self: start; }
+  label { display: block; color: var(--dim); font-size: 12px; margin-top: 8px; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  input[type=number] { width: 100%; background: #0e1015; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px; font: inherit; }
+  .seg { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 6px; }
+  button { padding: 7px 8px; background: #23262f; color: var(--text); border: 1px solid var(--line); border-radius: 6px; font: inherit; font-size: 13px; cursor: pointer; }
+  button.on { background: var(--accent); color: #1a1408; border-color: var(--accent); font-weight: 600; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 12px; }
+  .kv span:nth-child(odd) { color: var(--dim); }
+  .note { color: var(--dim); font-size: 12px; margin: 6px 0 0; }
+  .bar { height: 10px; border-radius: 3px; background: linear-gradient(90deg, #000, #2a1f4a, #5a3d8a, #b07acb, #f0d0a0, #fff); margin-top: 4px; }
+  .barlab { display: flex; justify-content: space-between; color: var(--dim); font-size: 11px; }
+  .sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+  th { text-align: right; color: var(--dim); font-weight: 400; padding: 2px 4px; border-bottom: 1px solid var(--line); }
+  td { text-align: right; padding: 2px 4px; border-bottom: 1px solid #1e2027; }
+  th:first-child, td:first-child { text-align: left; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; border: 1px solid #444; }
+  #hover { min-height: 18px; font-size: 12px; color: var(--accent); margin-top: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>@NAME@ 복셀 큐브: 한 픽셀을 가운데 두고 주변 복셀 그대로 보기</h1>
+  <p>복셀 하나 = 위 그림 1픽셀(가로·세로) × 옆 그림 1픽셀(높이) = <span id="pcpx"></span> 정육면체. 밀도 = 은하 전체 별 × 위 그림 그 픽셀의 빛 몫 × 그 기둥에서 그 높이의 몫(옆 그림 두 장의 곱). 큐브 축은 그림 축 그대로: 가로 = 위 그림 열(W), 깊이 = 위 그림 행(U), 위 = 높이(Y).</p>
+</header>
+<main>
+  <section>
+    <div class="panel">
+      <h2>3D 큐브 <small>드래그: 돌리기 · 밝기 = 밀도(로그) · 색 = 위 그림 그 픽셀의 색 · 노란 테두리 = 가운데 복셀</small></h2>
+      <canvas id="cube" width="760" height="760"></canvas>
+      <div id="hover"></div>
+    </div>
+    <div class="panel" style="margin-top:12px">
+      <h2>별 배치 <small>같은 회전 · 드래그로 돌리기 · ⊗ = 바라보는 방향(화면 안쪽) · 빨간 점 = 임의로 고른 꼭지점(모든 그림에 같은 꼭지점) · 색 = 별 표면 온도 · 밝기 = 별 밝기 (점 하나가 별 K개를 대신할 때는 K배)</small></h2>
+      <div class="seg" style="grid-template-columns:repeat(4,1fr);margin-bottom:8px">
+        <button id="whereCube" class="on">큐브 전체</button><button id="whereMid">가운데 복셀 하나</button>
+        <button id="placeEven" class="on">복셀 안 고르게 (게임 지금)</button><button id="placeSmooth">이웃 복셀과 이어서</button>
+      </div>
+      <canvas id="stars" width="760" height="760" style="width:100%;max-width:760px;aspect-ratio:1;display:block;margin:0 auto;background:#000;border-radius:4px;cursor:grab"></canvas>
+      <div class="stat" id="starStat" style="color:var(--dim);font-size:12px;margin-top:6px"></div>
+    </div>
+    <div class="panel" style="margin-top:12px">
+      <h2>시선 렌더 <small>큐브 한가운데(가운데 복셀의 중심)에 서서 둘러보기 · 드래그: 고개 돌리기(큐브와 같은 회전, 큐브 그림에서 화면 안쪽 방향을 봄) · 화면 픽셀마다 시선을 쏘아 지나는 복셀의 별빛을 더함 · 클릭: 그 시선의 복셀</small></h2>
+      <div class="seg" style="grid-template-columns:repeat(2,1fr);margin-bottom:6px">
+        <button id="rangeCube" class="on">큐브 안 복셀만</button><button id="rangeAll">은하 끝까지</button>
+      </div>
+      <div class="seg" style="grid-template-columns:repeat(3,1fr);margin-bottom:6px">
+        <button id="toneLog" class="on">대비 늘리기 (밝기 차이를 로그로 펼침)</button><button id="toneReal">실제 밝기 (노출만)</button><button id="starsOn" class="on">별 점 겹치기 켜짐</button>
+      </div>
+      <div class="sliders">
+        <label style="grid-column:1/-1">바라보는 방향: <b id="lookOut"></b></label>
+        <label>시야각: <b id="fovOut"></b><input type="range" id="fov" min="10" max="150" step="1" value="100"></label>
+      </div>
+      <canvas id="sight" width="400" height="400" style="width:100%;max-width:760px;aspect-ratio:1;display:block;margin:6px auto 0;background:#000;border-radius:4px;cursor:grab"></canvas>
+      <div class="stat" id="sightStat" style="color:var(--dim);font-size:12px;margin-top:6px"></div>
+      <div class="kv" id="rayInfo" style="margin-top:8px"></div>
+      <div style="max-height:320px;overflow:auto;margin-top:6px"><table id="rayTable"></table></div>
+    </div>
+    <div class="slices">
+      <div class="panel"><h2>가운데 가로 단면 <small>위에서 (열 × 행)</small></h2><canvas id="s0"></canvas></div>
+      <div class="panel"><h2>가운데 세로 단면 <small>U 방향에서 (열 × 높이)</small></h2><canvas id="s1"></canvas></div>
+      <div class="panel"><h2>가운데 세로 단면 <small>W 방향에서 (행 × 높이)</small></h2><canvas id="s2"></canvas></div>
+    </div>
+    <div class="pics">
+      <div class="panel"><h2>위 그림 <small>클릭 → 열, 행</small></h2><canvas id="py" width="512" height="512"></canvas></div>
+      <div class="panel"><h2>옆 그림 (U 방향) <small>클릭 → 열, 높이</small></h2><canvas id="pu" width="512" height="512"></canvas></div>
+      <div class="panel"><h2>옆 그림 (W 방향) <small>클릭 → 행, 높이</small></h2><canvas id="pw" width="512" height="512"></canvas></div>
+    </div>
+  </section>
+  <aside>
+    <div class="panel">
+      <h2>가운데 픽셀</h2>
+      <label>열 · 행 · 높이 (그림 픽셀, 0–1023)</label>
+      <div class="row"><input type="number" id="c" step="1"><input type="number" id="r" step="1"><input type="number" id="h" step="1"></div>
+      <label>큐브 크기</label>
+      <div class="seg" style="grid-template-columns:repeat(4,1fr)"><button id="n9" class="on">9³</button><button id="n19">19³</button><button id="n51">51³</button><button id="n101">101³</button></div>
+      <div class="seg"><button id="cullOn" class="on">보는 쪽만 만들기</button><button id="cullOff">큐브 전부 만들기</button></div>
+      <div class="seg"><button id="mid">은하 가운데 픽셀</button><button id="arm">원반 8 kpc 자리</button></div>
+      <label>먼지띠 메우기 (옆 그림 가운데 어두운 띠)</label>
+      <div class="seg"><button id="fillHill" class="on">곡선 (가운데가 가장 빽빽)</button><button id="fillFlat">평평 (예전)</button></div>
+      <label>밝기 기준</label>
+      <div class="seg"><button id="scaleCube" class="on">큐브 안 최대</button><button id="scaleAll">은하 전체 최대</button></div>
+      <div class="bar"></div><div class="barlab"><span id="lo"></span><span id="hi"></span></div>
+    </div>
+    <div class="panel">
+      <h2>숫자</h2>
+      <div class="kv" id="info"></div>
+      <p class="note">작은 그림(단면)은 한 칸이 복셀 하나입니다. 큐브는 한 변이 9픽셀이면 <span id="side9"></span>, 19픽셀이면 <span id="side19"></span>입니다.</p>
+    </div>
+  </aside>
+</main>
+<script>
+const STARS = @STARS@, N = 1024;
+const F = @FRAME@, LIGHT_RANGE = @LIGHTRANGE@;
+const PC = F.kpcPerPx * 1000, MC = F.middlePx.col, MR = F.middlePx.row, MID = (N - 1) / 2;
+const [W0, W1] = F.wAxis, [U0, U1] = F.uAxis;
+const LY = 3.2616;
+const $ = (id) => document.getElementById(id);
+const fmt = (v) => v >= 1e12 ? (v / 1e12).toFixed(2) + "조" : v >= 1e8 ? (v / 1e8).toFixed(2) + "억" : v >= 1e4 ? (v / 1e4).toFixed(2) + "만" : v >= 100 ? Math.round(v).toLocaleString() : v.toPrecision(3);
+$("pcpx").textContent = `${PC.toFixed(1)} pc (${(PC * LY).toFixed(0)} 광년)`;
+$("side9").textContent = `${(9 * PC).toFixed(0)} pc (${(9 * PC * LY).toFixed(0)} 광년)`;
+$("side19").textContent = `${(19 * PC).toFixed(0)} pc (${(19 * PC * LY).toFixed(0)} 광년)`;
+
+// ---- pictures: as drawn (colour) and the light put back (as the game: viewer/src/photo_volume.rs)
+const views = {};
+const loadImg = (src) => new Promise((done) => { const i = new Image(); i.onload = () => done(i); i.src = src; });
+function pixels(img) { const c = document.createElement("canvas"); c.width = c.height = N; const g = c.getContext("2d"); g.drawImage(img, 0, 0, N, N); return g.getImageData(0, 0, N, N).data; }
+async function load(key, src, lightSrc) {
+  const img = await loadImg(src), rgb = pixels(img), light = new Float32Array(N * N);
+  if (lightSrc) {
+    const px = pixels(await loadImg(lightSrc)), [lo, hi] = LIGHT_RANGE;
+    for (let i = 0; i < N * N; i++) { const v = px[4 * i] * 256 + px[4 * i + 1]; light[i] = v ? Math.pow(10, lo + (v - 1) / 65534 * (hi - lo)) : 0; }
+  } else for (let i = 0; i < N * N; i++) light[i] = (Math.pow(rgb[4 * i] / 255, 2.2) + Math.pow(rgb[4 * i + 1] / 255, 2.2) + Math.pow(rgb[4 * i + 2] / 255, 2.2)) / 3;
+  views[key] = { img, rgb, light };
+}
+// an edge view's column, its dust lane filled as viewer/src/photo_volume.rs fill: the sides' slopes
+// go on into the dip (a parabola in log of the light, FLANK pixels each side), peaking in the
+// middle, between the flat level and PEAK_MOST times it; flat where the sides make no hill.
+// Column-major [col * N + height]. flatOnly: the old flat filling, to compare
+const FLANK = 6, PEAK_MOST = 2;
+function hillThrough(p, at, middle) {
+  const a = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], r = [0, 0, 0];
+  for (const j of at) { const z = j - middle, q = [1, z, z * z], y = Math.log(p[j]); for (let i = 0; i < 3; i++) { for (let k = 0; k < 3; k++) a[i][k] += q[i] * q[k]; r[i] += q[i] * y; } }
+  const det = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+  const d = det(a); if (Math.abs(d) < 1e-12) return null;
+  const c = [0, 1, 2].map((i) => { const m = a.map((row) => row.slice()); for (let k = 0; k < 3; k++) m[k][i] = r[k]; return det(m) / d; });
+  const top = -c[1] / (2 * c[2]);
+  return c[2] < 0 && top > at[0] - middle && top < at[at.length - 1] - middle ? c : null;
+}
+function fillColumn(p, flatOnly) {
+  const n = p.length, up = new Float32Array(n), flat = new Float32Array(n);
+  let m = 0;
+  for (let k = 0; k < n; k++) { m = Math.max(m, p[k]); up[k] = m; }
+  m = 0;
+  for (let k = n - 1; k >= 0; k--) { m = Math.max(m, p[k]); flat[k] = Math.max(p[k], Math.min(up[k], m)); }
+  for (let k = 0; k < n;) {
+    if (flat[k] <= p[k]) { k++; continue; }
+    const a = k; while (k < n && flat[k] > p[k]) k++;
+    const b = k - 1, level = flat[a], mid = (a + b) / 2, sides = [];
+    for (let j = Math.max(0, a - FLANK); j < a; j++) if (p[j] > 0) sides.push(j);
+    for (let j = b + 1; j < Math.min(n, b + 1 + FLANK); j++) if (p[j] > 0) sides.push(j);
+    const c = !flatOnly && sides.length >= 5 ? hillThrough(p, sides, mid) : null;
+    for (let j = a; j <= b; j++) {
+      const z = j - mid;
+      p[j] = c ? Math.min(level * PEAK_MOST, Math.max(level, Math.exp(c[0] + c[1] * z + c[2] * z * z))) : level;
+    }
+  }
+}
+function fillColumns(v, flatOnly) {
+  const out = new Float32Array(N * N);
+  for (let col = 0; col < N; col++) {
+    const p = out.subarray(col * N, col * N + N);
+    for (let k = 0; k < N; k++) p[k] = v.light[k * N + col];
+    fillColumn(p, flatOnly);
+  }
+  return out;
+}
+let topSum = 0, FU, FW, peak = 0;
+const normCache = new Map();
+function normAt(row, col) {
+  const key = row * N + col;
+  if (normCache.has(key)) return normCache.get(key);
+  let s = 0;
+  const a = FU.subarray(col * N, col * N + N), b = FW.subarray(row * N, row * N + N);
+  for (let k = 0; k < N; k++) s += a[k] * b[k];
+  normCache.set(key, s);
+  return s;
+}
+// stars per pc^3, and its parts
+function voxel(col, row, h) {
+  if (col < 0 || row < 0 || h < 0 || col >= N || row >= N || h >= N) return { rho: 0, top: 0, height: 0 };
+  const top = views.y.light[row * N + col] / topSum, s = normAt(row, col);
+  const height = s > 0 ? FU[col * N + h] * FW[row * N + h] / s : 0;
+  return { rho: STARS * top * height / (PC * PC * PC), top, height };
+}
+const colourAt = (col, row) => { const i = 4 * (Math.min(N - 1, Math.max(0, row)) * N + Math.min(N - 1, Math.max(0, col))); return [views.y.rgb[i], views.y.rgb[i + 1], views.y.rgb[i + 2]]; };
+function place(col, row, h) { const w = (col - MC) * PC, u = (row - MR) * PC; return [w * W0 + u * U0, (MID - h) * PC, w * W1 + u * U1]; }
+
+// ---- state
+const S = { cull: true, tone: "log", sightStars: true, range: "cube", c: Math.round(MC), r: Math.round(MR), h: Math.round(MID), n: 9, scale: "cube", yaw: 0.7, pitch: 0.45, where: "cube", place: "even", fill: "hill" };
+let cells = [], lo = 0, hi = 1;
+// only the side looked at: a voxel is kept when any of it can be in the line-of-sight render's
+// field of view from the middle (its middle within the view's pyramid widened by its half
+// diagonal); the rest is not made at all
+const HALF_DIAG = Math.sqrt(3) / 2;
+function seesVoxel(dc, dr, dh) {
+  const cy = Math.cos(S.yaw), sy = Math.sin(S.yaw), cp = Math.cos(S.pitch), sp = Math.sin(S.pitch);
+  const x = dc, y = -dh, z = dr, x1 = cy * x + sy * z, z1 = -sy * x + cy * z, qy = cp * y - sp * z1, qz = sp * y + cp * z1;
+  const tf = Math.tan(+$("fov").value * Math.PI / 360), slack = HALF_DIAG * Math.sqrt(1 + tf * tf);
+  return qz > -HALF_DIAG && Math.abs(x1) <= qz * tf + slack && Math.abs(qy) <= qz * tf + slack;
+}
+let visibleCount = 0;
+function build() {
+  const k = (S.n - 1) / 2;
+  cells = [];
+  rhoCache.clear();
+  visibleCount = 0;
+  let mx = 0, mn = Infinity;
+  for (let dh = -k; dh <= k; dh++) for (let dr = -k; dr <= k; dr++) for (let dc = -k; dc <= k; dc++) {
+    if (S.cull && !seesVoxel(dc, dr, dh)) continue;
+    visibleCount++;
+    const v = voxel(S.c + dc, S.r + dr, S.h + dh);
+    cells.push({ dc, dr, dh, ...v, rgb: colourAt(S.c + dc, S.r + dr) });
+    if (v.rho > 0) { mx = Math.max(mx, v.rho); mn = Math.min(mn, v.rho); }
+  }
+  hi = S.scale === "cube" ? mx : peak;
+  lo = hi / 1e4;            // four decades shown
+  $("lo").textContent = `${lo.toPrecision(2)} 개/pc³`;
+  $("hi").textContent = `${hi.toPrecision(2)} 개/pc³`;
+  const mid = voxel(S.c, S.r, S.h), [x, y, z] = place(S.c, S.r, S.h);
+  const total = cells.reduce((s, q) => s + q.rho, 0) * PC ** 3, empty = cells.filter((q) => q.rho === 0).length;
+  $("info").innerHTML = `
+    <span>게임 좌표 (pc)</span><span>X ${x.toFixed(0)}, Y ${y.toFixed(0)}, Z ${z.toFixed(0)}</span>
+    <span>은하 중심에서</span><span>${(Math.hypot(x, z) / 1000).toFixed(2)} kpc, 높이 ${(y / 1000).toFixed(2)} kpc</span>
+    <span>가운데 복셀 밀도</span><span>${mid.rho.toPrecision(3)} 개/pc³ (태양 근처 ≈ 0.1)</span>
+    <span>가운데 복셀 별</span><span>${fmt(mid.rho * PC ** 3)}개</span>
+    <span>위 그림 빛 몫</span><span>${(mid.top * 100).toPrecision(3)}%</span>
+    <span>기둥 안 높이 몫</span><span>${(mid.height * 100).toPrecision(3)}%</span>
+    <span>만든 복셀</span><span>${visibleCount.toLocaleString()} / ${(S.n ** 3).toLocaleString()} (${(100 * visibleCount / S.n ** 3).toFixed(1)}%)${S.cull ? " · 보는 쪽만" : " · 전부"} · 꼭 필요한 값만 담으면 ${(visibleCount * 8 / 1024).toFixed(visibleCount * 8 < 102400 ? 1 : 0)} KB</span>
+    <span>큐브 ${S.n}³ = ${S.n ** 3}개 복셀</span><span>별 ${fmt(total)}개, 빈 복셀 ${empty}개</span>
+    <span>큐브 안 밀도 범위</span><span>${mn === Infinity ? "—" : `${mn.toPrecision(2)} ~ ${mx.toPrecision(2)} (${(mx / mn).toPrecision(2)}배)`}</span>`;
+  ["c", "r", "h"].forEach((k) => $(k).value = S[k]);
+  drawCube(); drawSlices(); drawPics(); makeStars(); renderSight(false);
+}
+// density -> 0..1 (log, four decades)
+const level = (rho) => rho <= 0 ? 0 : Math.max(0, Math.min(1, Math.log10(rho / lo) / 4));
+function ramp(t) {      // the bar's colours
+  const stops = [[0, 0, 0], [42, 31, 74], [90, 61, 138], [176, 122, 203], [240, 208, 160], [255, 255, 255]];
+  const x = t * (stops.length - 1), i = Math.min(stops.length - 2, Math.floor(x)), f = x - i;
+  return stops[i].map((v, k) => Math.round(v + (stops[i + 1][k] - v) * f));
+}
+
+// ---- the cube: each voxel a little box, the far ones first
+function drawCube() {
+  const cv = $("cube"), g = cv.getContext("2d"), W = cv.width;
+  g.fillStyle = "#000"; g.fillRect(0, 0, W, W);
+  const cy = Math.cos(S.yaw), sy = Math.sin(S.yaw), cp = Math.cos(S.pitch), sp = Math.sin(S.pitch);
+  // cube axes: x = column, y = height (up), z = row
+  const turn = ([x, y, z]) => { const x1 = cy * x + sy * z, z1 = -sy * x + cy * z; return [x1, cp * y - sp * z1, sp * y + cp * z1]; };
+  const unit = W * 0.5 / (S.n * 1.0);
+  const P = (q) => [W / 2 + q[0] * unit, W / 2 - q[1] * unit];
+  const items = cells.map((c) => ({ c, q: turn([c.dc, -c.dh, c.dr]) })).sort((a, b) => b.q[2] - a.q[2]);
+  const size = unit * 0.82;
+  for (const { c, q } of items) {
+    const t = level(c.rho);
+    const [px, py] = P(q);
+    if (t <= 0) { g.fillStyle = "rgba(90,90,100,0.25)"; g.fillRect(px - 1, py - 1, 2, 2); continue; }
+    const m = Math.max(c.rgb[0], c.rgb[1], c.rgb[2], 1);
+    const col = c.rgb.map((v) => Math.round((0.35 + 0.65 * v / m) * 255 * t));
+    g.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${0.25 + 0.7 * t})`;
+    g.fillRect(px - size / 2, py - size / 2, size, size);
+    if (c.dc === 0 && c.dr === 0 && c.dh === 0) { g.strokeStyle = "#f0c27a"; g.lineWidth = 2; g.strokeRect(px - size / 2 - 2, py - size / 2 - 2, size + 4, size + 4); }
+  }
+  { const [x, y] = P(turn([RED[0] * S.n / 2, RED[1] * S.n / 2, RED[2] * S.n / 2])); redDot(g, x, y, "빨간 꼭지점"); }
+  // the picked line of sight's voxels
+  g.fillStyle = "#7fd1ff";
+  for (const q of pickedLog) { const [px, py] = P(turn([q.col - S.c, -(q.h - S.h), q.row - S.r])); g.fillRect(px - 3, py - 3, 6, 6); }
+  // the cube's edges and axes
+  const k = S.n / 2;
+  const corners = [];
+  for (const a of [-k, k]) for (const b of [-k, k]) for (const d of [-k, k]) corners.push(turn([a, b, d]));
+  g.strokeStyle = "rgba(240,194,122,0.35)"; g.lineWidth = 1; g.beginPath();
+  for (let i = 0; i < 8; i++) for (let j = i + 1; j < 8; j++) { const x = i ^ j; if (x !== 1 && x !== 2 && x !== 4) continue; const [x1, y1] = P(corners[i]), [x2, y2] = P(corners[j]); g.moveTo(x1, y1); g.lineTo(x2, y2); }
+  g.stroke();
+  const axis = (v, label, colr) => { const [x0, y0] = P(turn([-k, -k, -k])), [x1, y1] = P(turn(v.map((a, i) => a === 0 ? -k : a))); g.strokeStyle = g.fillStyle = colr; g.lineWidth = 2; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); g.font = "bold 13px sans-serif"; g.fillText(label, x1 + 4, y1); };
+  axis([k + 1.5, 0, 0], "열 (W)", "#7fd1ff");
+  axis([0, k + 1.5, 0], "높이 (Y)", "#a8e6a1");
+  axis([0, 0, k + 1.5], "행 (U)", "#ff9f7f");
+  g.fillStyle = "#9a978f"; g.font = "12px sans-serif";
+  g.fillText(`${S.n}×${S.n}×${S.n} 복셀 · 한 변 ${(S.n * PC).toFixed(0)} pc (${(S.n * PC * LY).toFixed(0)} 광년)`, 10, 18);
+}
+
+// ---- the three middle slices, one square a voxel, with the density written in when there is room
+function slice(id, at, a, b) {
+  const cv = $(id), n = S.n, cell = Math.floor(380 / n), g = cv.getContext("2d");
+  cv.width = cv.height = cell * n;
+  const k = (n - 1) / 2;
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    const v = at(i - k, j - k), t = level(v.rho), [R, G, B] = ramp(t);
+    g.fillStyle = `rgb(${R},${G},${B})`; g.fillRect(i * cell, j * cell, cell, cell);
+    if (n <= 9) { g.fillStyle = t > 0.6 ? "#000" : "#ddd"; g.font = "10px sans-serif"; g.textAlign = "center"; g.fillText(v.rho > 0 ? v.rho.toPrecision(2) : "0", i * cell + cell / 2, j * cell + cell / 2 + 3); }
+  }
+  g.strokeStyle = "#f0c27a"; g.lineWidth = 2; g.strokeRect(k * cell + 1, k * cell + 1, cell - 2, cell - 2);
+  cv.onmousemove = (e) => {
+    const r = cv.getBoundingClientRect(), i = Math.floor((e.clientX - r.left) / r.width * n), j = Math.floor((e.clientY - r.top) / r.height * n);
+    const v = at(i - k, j - k);
+    $("hover").textContent = `${a} ${i - k >= 0 ? "+" : ""}${i - k}, ${b} ${j - k >= 0 ? "+" : ""}${j - k}: ${v.rho.toPrecision(3)} 개/pc³ (복셀에 ${fmt(v.rho * PC ** 3)}개)`;
+  };
+}
+function drawSlices() {
+  slice("s0", (i, j) => voxel(S.c + i, S.r + j, S.h), "열", "행");
+  slice("s1", (i, j) => voxel(S.c + i, S.r, S.h + j), "열", "높이(아래+)");
+  slice("s2", (i, j) => voxel(S.c, S.r + i, S.h + j), "행", "높이(아래+)");
+}
+
+// ---- the pictures with the cube on them
+function drawPics() {
+  const mark = (id, img, x, y) => {
+    const cv = $(id), g = cv.getContext("2d"), s = cv.width / N;
+    g.drawImage(img, 0, 0, cv.width, cv.height);
+    const half = S.n / 2;
+    g.strokeStyle = "#f0c27a"; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(x * s, 0); g.lineTo(x * s, cv.height); g.moveTo(0, y * s); g.lineTo(cv.width, y * s); g.globalAlpha = 0.35; g.stroke(); g.globalAlpha = 1;
+    g.lineWidth = 2; g.strokeRect((x - half) * s - 2, (y - half) * s - 2, S.n * s + 4, S.n * s + 4);
+  };
+  mark("py", views.y.img, S.c, S.r);
+  mark("pu", views.u.img, S.c, S.h);
+  mark("pw", views.w.img, S.r, S.h);
+}
+
+
+// ---- stars: as many as the voxels hold (each voxel's stars from its density), at most DRAW_MAX
+// drawn, each then standing for K; placed evenly inside its voxel (as the game: photo_volume.rs
+// place) or following the density between the voxels' middles (trilinear)
+const DRAW_MAX = 150000;
+function hash(...v) { let h = 2166136261 >>> 0; for (const n of v) { h ^= n & 0xffffffff; h = Math.imul(h, 16777619) >>> 0; h ^= h >>> 13; } return h >>> 0; }
+function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function massDraw(r, mMax) {
+  const a1 = (Math.pow(0.08, -0.3) - Math.pow(0.5, -0.3)) / 0.3, hi = Math.max(mMax, 0.5);
+  const a2 = 0.5 * (Math.pow(0.5, -1.3) - Math.pow(hi, -1.3)) / 1.3;
+  const seg = (lo, top, alpha, v) => Math.pow(Math.pow(lo, 1 - alpha) + v * (Math.pow(top, 1 - alpha) - Math.pow(lo, 1 - alpha)), 1 / (1 - alpha));
+  return r() < a1 / (a1 + a2) ? seg(0.08, Math.min(0.5, mMax), 1.3, r()) : seg(0.5, hi, 2.3, r());
+}
+const lum = (m) => m < 0.43 ? 0.23 * Math.pow(m, 2.3) : m < 2 ? Math.pow(m, 4) : 1.4 * Math.pow(m, 3.5);
+const kelvin = (m) => Math.min(40000, Math.max(2600, 5772 * Math.pow(m, 0.55)));
+function colourOf(k) {
+  const t = k / 100;
+  const r = t <= 66 ? 1 : Math.min(1, Math.max(0, 1.292936 * Math.pow(t - 60, -0.1332047592)));
+  const g = t <= 66 ? Math.min(1, Math.max(0, 0.3900816 * Math.log(t) - 0.6318414)) : Math.min(1, Math.max(0, 1.1298909 * Math.pow(t - 60, -0.0755148492)));
+  const b = t >= 66 ? 1 : t <= 19 ? 0 : Math.min(1, Math.max(0, 0.5432068 * Math.log(t - 10) - 1.1962541));
+  return [r, g, b];
+}
+const rhoCache = new Map();
+const rhoAt = (c, r, h) => { const k = (c * N + r) * N + h; if (!rhoCache.has(k)) rhoCache.set(k, voxel(c, r, h).rho); return rhoCache.get(k); };
+// density between the voxels' middles (offsets in voxels from the cube's middle voxel)
+function trilinear(x, y, z) {
+  const fx = Math.floor(x), fy = Math.floor(y), fz = Math.floor(z), tx = x - fx, ty = y - fy, tz = z - fz;
+  let s = 0;
+  for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) for (let k = 0; k < 2; k++)
+    s += (i ? tx : 1 - tx) * (j ? ty : 1 - ty) * (k ? tz : 1 - tz) * rhoAt(S.c + fx + i, S.r + fy + j, S.h + fz + k);
+  return s;
+}
+let stars = [], starInfo = {};
+function makeStars() {
+  const half = S.where === "cube" ? (S.n - 1) / 2 : 0;
+  const list = [];
+  let total = 0;
+  for (let dh = -half; dh <= half; dh++) for (let dr = -half; dr <= half; dr++) for (let dc = -half; dc <= half; dc++) {
+    if (S.cull && half > 0 && !seesVoxel(dc, dr, dh)) continue;
+    const rho = rhoAt(S.c + dc, S.r + dr, S.h + dh);
+    list.push({ dc, dr, dh, rho, n: rho * PC ** 3 });
+    total += rho * PC ** 3;
+  }
+  const K = Math.max(1, total / DRAW_MAX);
+  stars = [];
+  for (const v of list) {
+    if (v.n <= 0) continue;
+    const r = rng(hash(S.c + v.dc, S.r + v.dr, S.h + v.dh, S.place === "smooth" ? 7 : 3));
+    const want = v.n / K, count = Math.floor(want) + (r() < want - Math.floor(want) ? 1 : 0);
+    const [R, G, B] = colourAt(S.c + v.dc, S.r + v.dr);
+    const young = Math.min(1, Math.max(0, (B / Math.max(R, 1) - 0.85) / 0.4)), mMax = 0.9 + young * 39.1;
+    // the most the density gets in this voxel (its corners), for the trilinear draw
+    let most = 0;
+    if (S.place === "smooth") for (const a of [-0.5, 0.5]) for (const b of [-0.5, 0.5]) for (const d of [-0.5, 0.5]) most = Math.max(most, trilinear(v.dc + a, v.dh + b, v.dr + d) || 0);
+    for (let i = 0; i < count; i++) {
+      let p;
+      for (let tries = 0; tries < 30; tries++) {
+        p = [v.dc + r() - 0.5, v.dh + r() - 0.5, v.dr + r() - 0.5];     // column, height, row (voxels)
+        if (S.place !== "smooth" || most <= 0 || r() * most <= trilinear(p[0], p[1], p[2])) break;
+      }
+      const m = massDraw(r, mMax);
+      stars.push({ p: [p[0], -p[1], p[2]], L: lum(m) * K, c: colourOf(kelvin(m)) });
+    }
+  }
+  const mid = rhoAt(S.c, S.r, S.h);
+  if (typeof renderSight === "function" && FU) setTimeout(() => renderSight(false), 0);
+  starInfo = { total, K, drawn: stars.length, spacing: mid > 0 ? Math.cbrt(1 / mid) * LY : 0, side: (2 * half + 1) * PC };
+  drawStars();
+}
+function drawStars() {
+  const cv = $("stars"), g = cv.getContext("2d"), W = cv.width;
+  const acc = new Float32Array(W * W * 3);
+  const cy = Math.cos(S.yaw), sy = Math.sin(S.yaw), cp = Math.cos(S.pitch), sp = Math.sin(S.pitch);
+  const turn = ([x, y, z]) => { const x1 = cy * x + sy * z, z1 = -sy * x + cy * z; return [x1, cp * y - sp * z1, sp * y + cp * z1]; };
+  const side = S.where === "cube" ? S.n : 1, unit = W * 0.5 / side;
+  const P = (q) => [W / 2 + q[0] * unit, W / 2 - q[1] * unit];
+  const Ls = stars.map((s) => s.L).sort((a, b) => a - b), ref = Ls.length ? Ls[Math.floor(Ls.length * 0.98)] : 1;
+  for (const s of stars) {
+    const [px, py] = P(turn(s.p)), x = Math.round(px), y = Math.round(py);
+    if (x < 1 || y < 1 || x >= W - 1 || y >= W - 1) continue;
+    const b = 0.5 * Math.sqrt(s.L / ref);
+    const spread = b > 1 ? 1 : 0;
+    for (let dy = -spread; dy <= spread; dy++) for (let dx = -spread; dx <= spread; dx++) {
+      const f = b / (1 + 2 * (dx * dx + dy * dy)), i = 3 * ((y + dy) * W + x + dx);
+      acc[i] += s.c[0] * f; acc[i + 1] += s.c[1] * f; acc[i + 2] += s.c[2] * f;
+    }
+  }
+  const img = g.createImageData(W, W);
+  for (let i = 0; i < W * W; i++) { for (let k = 0; k < 3; k++) img.data[4 * i + k] = 255 * Math.pow(1 - Math.exp(-acc[3 * i + k] * 2), 1 / 2.2); img.data[4 * i + 3] = 255; }
+  g.putImageData(img, 0, 0);
+  // the cube's edges, and the voxels' edges on the near faces when there are few
+  const k = side / 2, corners = [];
+  for (const a of [-k, k]) for (const b of [-k, k]) for (const d of [-k, k]) corners.push(turn([a, b, d]));
+  g.strokeStyle = "rgba(240,194,122,0.45)"; g.lineWidth = 1; g.beginPath();
+  for (let i = 0; i < 8; i++) for (let j = i + 1; j < 8; j++) { const x = i ^ j; if (x !== 1 && x !== 2 && x !== 4) continue; const [x1, y1] = P(corners[i]), [x2, y2] = P(corners[j]); g.moveTo(x1, y1); g.lineTo(x2, y2); }
+  g.stroke();
+  // where the line-of-sight render looks: into the screen from the middle; its field of view's
+  // four corner lines (seen end on they fan out from the middle), and its frame where they leave the cube
+  const tf = Math.tan(+$("fov").value * Math.PI / 360), fr = k / Math.max(1, tf) * tf;
+  g.strokeStyle = "rgba(127,209,255,0.8)"; g.lineWidth = 1; g.setLineDash([5, 4]); g.beginPath();
+  for (const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { g.moveTo(W / 2, W / 2); g.lineTo(W / 2 + a * fr * unit, W / 2 - b * fr * unit); }
+  g.rect(W / 2 - fr * unit, W / 2 - fr * unit, 2 * fr * unit, 2 * fr * unit);
+  g.stroke(); g.setLineDash([]);
+  g.strokeStyle = "#7fd1ff"; g.lineWidth = 2; g.beginPath();
+  g.arc(W / 2, W / 2, 9, 0, 7); g.moveTo(W / 2 - 4, W / 2 - 4); g.lineTo(W / 2 + 4, W / 2 + 4); g.moveTo(W / 2 + 4, W / 2 - 4); g.lineTo(W / 2 - 4, W / 2 + 4); g.stroke();
+  { const [x, y] = P(turn([RED[0] * k, RED[1] * k, RED[2] * k])); redDot(g, x, y, "빨간 꼭지점"); }
+  g.fillStyle = "#9a978f"; g.font = "12px sans-serif";
+  g.fillText(`한 변 ${starInfo.side.toFixed(0)} pc (${(starInfo.side * LY).toFixed(0)} 광년)`, 10, 18);
+  g.fillStyle = "#7fd1ff"; g.font = "13px sans-serif";
+  g.fillText(`⊗ 바라보는 방향 (화면 안쪽으로): ${lookText()}`, 10, W - 28);
+  { const p = [RED[0] * k, RED[1] * k, RED[2] * k], a = place(S.c + p[0], S.r + p[2], S.h - p[1]), b = place(S.c, S.r, S.h), v = a.map((x, i) => x - b[i]), l = Math.hypot(...v);
+    redDot(g, 16, W - 50, ""); g.fillStyle = "#ff3b30"; g.fillText(`빨간 꼭지점: 방위각 ${(Math.atan2(v[2], v[0]) * 180 / Math.PI).toFixed(1)}°, 고도각 ${(Math.asin(v[1] / l) * 180 / Math.PI).toFixed(1)}°`, 28, W - 46); }
+  g.fillText(`파란 점선 = 시선 렌더의 시야 (${$("fov").value}°)`, 10, W - 10);
+  $("starStat").textContent = `실제 별 ${fmt(starInfo.total)}개 · 그린 점 ${fmt(starInfo.drawn)}개` +
+    (starInfo.K > 1 ? ` (점 하나 = 별 ${fmt(starInfo.K)}개)` : " (별 하나하나 그대로)") +
+    ` · 가운데 복셀에서 별 사이 평균 거리 ${starInfo.spacing ? starInfo.spacing.toPrecision(3) + " 광년" : "—"}`;
+}
+
+// ---- lines of sight: a camera on the cube's turn (the same yaw and pitch), looking at the
+// cube's middle voxel from DIST away; each screen pixel a line of sight through the voxels
+// (Amanatides & Woo), adding up density x the length in each x its colour; only the cube's voxels,
+// or on through the whole galaxy. World here: x = column, y = up (= -height row), z = row, in voxels
+// from the middle voxel; the view (as drawCube's turn): x right, y up, z away.
+let sightW = 400, picked = null, pickedLog = [], sightAuto = 1;
+const unturn = ([a, b, c]) => {
+  const cy = Math.cos(S.yaw), sy = Math.sin(S.yaw), cp = Math.cos(S.pitch), sp = Math.sin(S.pitch);
+  const y = cp * b + sp * c, z1 = -sp * b + cp * c;
+  return [cy * a - sy * z1, y, sy * a + cy * z1];
+};
+// where the camera looks (into the screen of the cube views), in the game's axes
+function lookAngles() {
+  const f = unturn([0, 0, 1]), a = place(S.c + f[0], S.r + f[2], S.h - f[1]), b = place(S.c, S.r, S.h), v = a.map((x, i) => x - b[i]), l = Math.hypot(...v);
+  return { az: Math.atan2(v[2], v[0]) * 180 / Math.PI, el: Math.asin(v[1] / l) * 180 / Math.PI };
+}
+const lookText = () => { const a = lookAngles(); return `방위각 ${a.az.toFixed(1)}° (X→Z), 고도각 ${a.el.toFixed(1)}° (게임 좌표)`; };
+// one corner of the cube, picked at random once, marked red in every view to keep one's bearings
+const RED = [0, 1, 2].map(() => Math.random() < 0.5 ? -1 : 1);
+function redDot(g, x, y, label) {
+  g.fillStyle = "#ff3b30"; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill();
+  g.strokeStyle = "#fff"; g.lineWidth = 1.5; g.stroke();
+  if (label) { g.font = "bold 12px sans-serif"; g.fillText(label, x + 9, y + 4); }
+}
+// the camera stands at the middle voxel's middle and looks where the cube view looks (into the screen)
+function camera() { return { o: [0, 0, 0], d: 0 }; }
+function sightRay(px, py, W) {
+  const t = Math.tan(+$("fov").value * Math.PI / 360), a = (2 * (px + 0.5) / W - 1) * t, b = (1 - 2 * (py + 0.5) / W) * t;
+  const v = unturn([a, b, 1]), l = Math.hypot(...v);
+  return [v[0] / l, v[1] / l, v[2] / l];
+}
+function march(oW, dW, log) {
+  // into voxel indices: column, row, height row
+  const o = [S.c + oW[0], S.r + oW[2], S.h - oW[1]], d = [dW[0], dW[2], -dW[1]];
+  const k = (S.n - 1) / 2, all = S.range === "all";
+  const lo = all ? [-0.5, -0.5, -0.5] : [S.c - k - 0.5, S.r - k - 0.5, S.h - k - 0.5];
+  const hi = all ? [N - 0.5, N - 0.5, N - 0.5] : [S.c + k + 0.5, S.r + k + 0.5, S.h + k + 0.5];
+  let t0 = 0, t1 = Infinity;
+  for (let i = 0; i < 3; i++) {
+    if (Math.abs(d[i]) < 1e-12) { if (o[i] < lo[i] || o[i] >= hi[i]) return [0, 0, 0, 0]; continue; }
+    let a = (lo[i] - o[i]) / d[i], b = (hi[i] - o[i]) / d[i];
+    if (a > b) [a, b] = [b, a];
+    t0 = Math.max(t0, a); t1 = Math.min(t1, b);
+  }
+  if (t0 >= t1) return [0, 0, 0, 0];
+  const g = o.map((v, i) => v + d[i] * t0 + 0.5);
+  const v = g.map((x, i) => Math.min(Math.ceil(hi[i]) - 1, Math.max(Math.ceil(lo[i]), Math.floor(x))));
+  const step = d.map((x) => x > 0 ? 1 : -1), tD = d.map((x) => Math.abs(x) < 1e-12 ? Infinity : 1 / Math.abs(x));
+  const tM = [0, 1, 2].map((i) => Math.abs(d[i]) < 1e-12 ? Infinity : t0 + (d[i] > 0 ? v[i] + 1 - g[i] : g[i] - v[i]) / Math.abs(d[i]));
+  let t = t0, R = 0, G = 0, B = 0, used = 0;
+  for (let guard = 0; guard < 4 * N; guard++) {
+    const i = tM[0] < tM[1] ? (tM[0] < tM[2] ? 0 : 2) : (tM[1] < tM[2] ? 1 : 2);
+    const tn = Math.min(tM[i], t1), seg = tn - t;
+    const rho = all ? voxel(v[0], v[1], v[2]).rho : rhoAt(v[0], v[1], v[2]);
+    if (rho > 0) {
+      const c = colourAt(v[0], v[1]), m = Math.max((c[0] + c[1] + c[2]) / 3, 1), e = rho * seg * PC;   // stars a pc^2
+      R += e * Math.pow(c[0] / m, 1.6); G += e * Math.pow(c[1] / m, 1.6); B += e * Math.pow(c[2] / m, 1.6);
+      if (log) log.push({ col: v[0], row: v[1], h: v[2], t, seg, rho, e, c });
+    }
+    used++;
+    if (tn >= t1) break;
+    t = tn; v[i] += step[i];
+    if (v[i] < lo[i] + 0.5 || v[i] > hi[i] - 0.5) break;
+    tM[i] += tD[i];
+  }
+  return [R, G, B, used];
+}
+function renderSight(fast) {
+  if (!FU) return;
+  const cvs = $("sight"), W = fast ? 120 : S.range === "all" ? 240 : 400;
+  cvs.width = cvs.height = sightW = W;
+  const g = cvs.getContext("2d"), cam = camera(), light = new Float32Array(W * W * 3);
+  const t0 = performance.now();
+  let voxels = 0;
+  for (let y = 0; y < W; y++) for (let x = 0; x < W; x++) {
+    const [r, gg, b, used] = march(cam.o, sightRay(x, y, W), null), i = 3 * (y * W + x);
+    light[i] = r; light[i + 1] = gg; light[i + 2] = b; voxels += used;
+  }
+  // tone: "log" spreads the light's range in this view (1% .. 99.7% of the pixels, log) over black
+  // to white, each pixel keeping its colour; "real" only an exposure (most of it white when the
+  // light is nearly even all round, as inside the galaxy)
+  const lums = [];
+  for (let i = 0; i < W * W; i++) { const l = light[3 * i] + light[3 * i + 1] + light[3 * i + 2]; if (l > 0) lums.push(l); }
+  lums.sort((a, b) => a - b);
+  const pc = (f) => lums.length ? lums[Math.min(lums.length - 1, Math.floor(lums.length * f))] : 1;
+  const lo = Math.log(pc(0.01)), hi = Math.log(pc(0.997)), span = Math.max(hi - lo, 1e-3);
+  if (!fast) sightAuto = lums.length ? 1.5 / Math.max(pc(0.995) / 3, 1e-30) : 1;
+  const img = g.createImageData(W, W);
+  for (let i = 0; i < W * W; i++) {
+    const r = light[3 * i], gg = light[3 * i + 1], b = light[3 * i + 2], l = r + gg + b;
+    if (S.tone === "log") {
+      const t = l > 0 ? Math.max(0, Math.min(1, (Math.log(l) - lo) / span)) : 0, m = Math.max(r, gg, b, 1e-30);
+      const cc = [r / m, gg / m, b / m].map((x) => 0.35 + 0.65 * x);     // its colour, a little stronger
+      for (let c = 0; c < 3; c++) img.data[4 * i + c] = 255 * Math.pow(t, 1.4) * cc[c];
+    } else for (let c = 0; c < 3; c++) img.data[4 * i + c] = 255 * Math.pow(1 - Math.exp(-light[3 * i + c] * sightAuto), 1 / 2.2);
+    img.data[4 * i + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  // the stars of the star panel (the cube's, or the middle voxel's), as points: light / distance^2
+  let shown = 0;
+  if (S.sightStars && !fast) {
+    const cy = Math.cos(S.yaw), sy = Math.sin(S.yaw), cp = Math.cos(S.pitch), sp = Math.sin(S.pitch);
+    const turn = ([x, y, z]) => { const x1 = cy * x + sy * z, z1 = -sy * x + cy * z; return [x1, cp * y - sp * z1, sp * y + cp * z1]; };
+    const tf = Math.tan(+$("fov").value * Math.PI / 360);
+    const seen = [];
+    for (const s of stars) {
+      const q = turn(s.p);
+      if (q[2] <= 1e-6) continue;
+      const x = W / 2 + q[0] / q[2] / tf * W / 2, y = W / 2 - q[1] / q[2] / tf * W / 2;
+      if (x < 0 || y < 0 || x >= W || y >= W) continue;
+      const d2 = (q[0] * q[0] + q[1] * q[1] + q[2] * q[2]) * PC * PC;
+      seen.push([x, y, s.L / d2, s.c]);
+    }
+    const fl = seen.map((s) => s[2]).sort((a, b) => a - b), ref = fl.length ? fl[Math.floor(fl.length * 0.97)] : 1;
+    const px = g.getImageData(0, 0, W, W);
+    for (const [x, y, f, c] of seen) {
+      const b = Math.min(1.5, Math.sqrt(f / ref)), xi = Math.floor(x), yi = Math.floor(y);
+      if (b < 0.04) continue;
+      shown++;
+      const rad = b > 0.8 ? 1 : 0;
+      for (let dy = -rad; dy <= rad; dy++) for (let dx = -rad; dx <= rad; dx++) {
+        const X = xi + dx, Y = yi + dy; if (X < 0 || Y < 0 || X >= W || Y >= W) continue;
+        const k = 4 * (Y * W + X), a = Math.min(1, b / (1 + 2 * (dx * dx + dy * dy)));
+        for (let ch = 0; ch < 3; ch++) px.data[k + ch] = Math.min(255, px.data[k + ch] * (1 - a) + 255 * c[ch] * a + 40 * a);
+      }
+    }
+    g.putImageData(px, 0, 0);
+  }
+  if (picked) { g.strokeStyle = "#7fd1ff"; g.lineWidth = 1; g.strokeRect(picked.u * W - 4, picked.v * W - 4, 8, 8); }
+  // the red corner (of the cube): its direction from the middle (game axes), and where it is in
+  // this view; off the screen, an arrow at the edge pointing to it
+  {
+    const cy = Math.cos(S.yaw), sy = Math.sin(S.yaw), cp = Math.cos(S.pitch), sp = Math.sin(S.pitch), k = S.n / 2;
+    const p = [RED[0] * k, RED[1] * k, RED[2] * k], x1 = cy * p[0] + sy * p[2], z1 = -sy * p[0] + cy * p[2], q = [x1, cp * p[1] - sp * z1, sp * p[1] + cp * z1];
+    const a = place(S.c + p[0], S.r + p[2], S.h - p[1]), b = place(S.c, S.r, S.h), v = a.map((x, i) => x - b[i]), l = Math.hypot(...v);
+    const az = Math.atan2(v[2], v[0]) * 180 / Math.PI, el = Math.asin(v[1] / l) * 180 / Math.PI;
+    const off = Math.acos(Math.max(-1, Math.min(1, q[2] / Math.hypot(...q)))) * 180 / Math.PI;    // from the look direction
+    const tf = Math.tan(+$("fov").value * Math.PI / 360);
+    let inView = false;
+    if (q[2] > 0) {
+      const x = W / 2 + q[0] / q[2] / tf * W / 2, y = W / 2 - q[1] / q[2] / tf * W / 2;
+      inView = x >= 0 && y >= 0 && x < W && y < W;
+      if (inView && !fast) redDot(g, x, y, "빨간 꼭지점");
+    }
+    if (!inView) {
+      // an arrow at the screen's edge, toward it
+      const ang = Math.atan2(-q[1], q[0]), r = W / 2 - 14, ex = W / 2 + Math.cos(ang) * r, ey = W / 2 + Math.sin(ang) * r;
+      g.save(); g.translate(ex, ey); g.rotate(ang);
+      g.fillStyle = "#ff3b30"; g.strokeStyle = "#fff"; g.lineWidth = 1.5;
+      g.beginPath(); g.moveTo(10, 0); g.lineTo(-6, -7); g.lineTo(-6, 7); g.closePath(); g.fill(); g.stroke(); g.restore();
+    }
+    $("lookOut").innerHTML = `${lookText()}<br><span style="color:#ff3b30">●</span> 빨간 꼭지점: 방위각 ${az.toFixed(1)}°, 고도각 ${el.toFixed(1)}°, 가운데에서 ${(l * LY).toFixed(0)} 광년 · 바라보는 방향에서 ${off.toFixed(1)}° ${inView ? "(화면 안)" : "(화면 밖: 가장자리 빨간 화살표 쪽)"}`;
+  }
+  $("fovOut").textContent = `${$("fov").value}°`;
+  $("sightStat").textContent = `${W}×${W} 시선 · 밝기 범위 ${Math.exp(span).toPrecision(2)}배 (어두운 1% ~ 밝은 0.3%) · 별 점 ${shown.toLocaleString()}개 (별 배치 패널의 별) · 시선 하나당 평균 복셀 ${(voxels / (W * W)).toFixed(1)}개 · ${(performance.now() - t0).toFixed(0)} ms` + (fast ? " (돌리는 중: 낮은 해상도)" : "");
+  analyse();
+}
+// the picked line of sight, voxel by voxel, with the angles it is seen at (the game's axes)
+function analyse() {
+  if (!picked) { $("rayInfo").innerHTML = ""; $("rayTable").innerHTML = ""; return; }
+  const cam = camera(), d = sightRay(picked.u * sightW - 0.5, picked.v * sightW - 0.5, sightW), log = [];
+  march(cam.o, d, log);
+  pickedLog = log;
+  const camGame = place(S.c + cam.o[0], S.r + cam.o[2], S.h - cam.o[1]);
+  const dirGame = (() => { const a = place(S.c + cam.o[0] + d[0], S.r + cam.o[2] + d[2], S.h - cam.o[1] - d[1]); const v = a.map((x, i) => x - camGame[i]), l = Math.hypot(...v); return v.map((x) => x / l); })();
+  const az = Math.atan2(dirGame[2], dirGame[0]) * 180 / Math.PI, el = Math.asin(dirGame[1]) * 180 / Math.PI;
+  const total = log.reduce((s, q) => s + q.e, 0), stars = log.reduce((s, q) => s + q.rho * PC * PC * PC * q.seg, 0);
+  $("rayInfo").innerHTML = `
+    <span>시선 방향 (게임 좌표)</span><span>방위각 ${az.toFixed(2)}° (X→Z), 고도각 ${el.toFixed(2)}°</span>
+    <span>원반과의 각</span><span>${Math.abs(el).toFixed(2)}°${Math.abs(el) > 0.5 ? ` (원반 두께를 ${(1 / Math.sin(Math.abs(el) * Math.PI / 180)).toFixed(1)}배 길이로 지남)` : " (거의 수평)"}</span>
+    <span>별빛이 있는 복셀</span><span>${log.length}개${log.length ? `, ${fmt((log[log.length - 1].t + log[log.length - 1].seg) * PC * LY)} 광년 깊이까지` : ""}</span>
+    <span>지나간 별 (복셀 단면 하나 폭)</span><span>${fmt(stars)}개</span>`;
+  const rows = log.slice(0, 300).map((q, i) => {
+    const p = place(q.col, q.row, q.h), v = p.map((x, k) => x - camGame[k]), l = Math.hypot(...v);
+    const a = Math.atan2(v[2], v[0]) * 180 / Math.PI, e = Math.asin(v[1] / l) * 180 / Math.PI;
+    const m = Math.max(...q.c, 1), sw = `rgb(${q.c.map((x) => Math.round(255 * x / m)).join(",")})`;
+    return `<tr><td>${i + 1}</td><td>${(l * LY).toPrecision(4)} 광년</td><td>${a.toFixed(2)}°</td><td>${e.toFixed(2)}°</td><td>${q.col - S.c >= 0 ? "+" : ""}${q.col - S.c}, ${q.row - S.r >= 0 ? "+" : ""}${q.row - S.r}, ${q.h - S.h >= 0 ? "+" : ""}${q.h - S.h}</td><td>${(q.seg * PC).toFixed(1)}</td><td>${q.rho.toPrecision(3)}</td><td><span class="sw" style="background:${sw}"></span> ${(100 * q.e / total).toFixed(1)}%</td></tr>`;
+  }).join("");
+  $("rayTable").innerHTML = `<tr><th>#</th><th>거리</th><th>방위각</th><th>고도각</th><th>복셀 (열,행,높이) 가운데에서</th><th>지난 길이 pc</th><th>별/pc³</th><th>빛의 몫</th></tr>${rows}` + (log.length > 300 ? `<tr><td colspan="8">… ${log.length - 300}개 더</td></tr>` : "");
+  drawCube();
+}
+let sightTimer = 0;
+// turning: drawn at once from what there is; then, looking elsewhere, the voxels and stars of the
+// new side are made (and the old side's let go)
+function turned() { drawCube(); drawStars(); renderSight(true); clearTimeout(sightTimer); sightTimer = setTimeout(() => S.cull ? build() : renderSight(false), 250); }
+
+// ---- controls
+const click = (id, f) => $(id).addEventListener("click", (e) => { const r = e.target.getBoundingClientRect(); f(Math.round((e.clientX - r.left) / r.width * N), Math.round((e.clientY - r.top) / r.height * N)); build(); });
+click("py", (x, y) => { S.c = x; S.r = y; });
+click("pu", (x, y) => { S.c = x; S.h = y; });
+click("pw", (x, y) => { S.r = x; S.h = y; });
+["c", "r", "h"].forEach((k) => $(k).addEventListener("change", () => { S[k] = Math.max(0, Math.min(N - 1, +$(k).value)); build(); }));
+const toggle = (on, off) => { $(on).classList.add("on"); $(off).classList.remove("on"); };
+const SIZES = [9, 19, 51, 101];
+function setSize(n) { S.n = n; SIZES.forEach((m) => $("n" + m).classList.toggle("on", m === n)); rhoCache.clear(); build(); }
+SIZES.forEach((m) => $("n" + m).onclick = () => setSize(m));
+$("scaleCube").onclick = () => { S.scale = "cube"; toggle("scaleCube", "scaleAll"); build(); };
+$("scaleAll").onclick = () => { S.scale = "all"; toggle("scaleAll", "scaleCube"); build(); };
+$("mid").onclick = () => { S.c = Math.round(MC); S.r = Math.round(MR); S.h = Math.round(MID); build(); };
+// 8 kpc out along the long axis, in the disc's middle plane
+$("arm").onclick = () => { S.c = Math.round(MC + 8000 * W0 / PC); S.r = Math.round(MR + 8000 * U0 / PC); S.h = Math.round(MID); build(); };
+const cv = $("cube");
+let drag = null;
+cv.addEventListener("pointerdown", (e) => { drag = [e.clientX, e.clientY]; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener("pointermove", (e) => { if (!drag) return; S.yaw += (e.clientX - drag[0]) * 0.01; S.pitch = Math.max(-1.5, Math.min(1.5, S.pitch + (e.clientY - drag[1]) * 0.01)); drag = [e.clientX, e.clientY]; turned(); });
+cv.addEventListener("pointerup", () => drag = null);
+const sv = $("stars");
+let sdrag = null;
+sv.addEventListener("pointerdown", (e) => { sdrag = [e.clientX, e.clientY]; sv.setPointerCapture(e.pointerId); });
+sv.addEventListener("pointermove", (e) => { if (!sdrag) return; S.yaw += (e.clientX - sdrag[0]) * 0.01; S.pitch = Math.max(-1.5, Math.min(1.5, S.pitch + (e.clientY - sdrag[1]) * 0.01)); sdrag = [e.clientX, e.clientY]; turned(); });
+sv.addEventListener("pointerup", () => sdrag = null);
+const sc = $("sight");
+let pdrag = null, pmoved = false;
+sc.addEventListener("pointerdown", (e) => { pdrag = [e.clientX, e.clientY]; pmoved = false; sc.setPointerCapture(e.pointerId); });
+sc.addEventListener("pointermove", (e) => {
+  if (!pdrag) return;
+  const dx = e.clientX - pdrag[0], dy = e.clientY - pdrag[1];
+  if (!pmoved && Math.abs(dx) + Math.abs(dy) < 3) return;
+  pmoved = true; S.yaw += dx * 0.01; S.pitch = Math.max(-1.5, Math.min(1.5, S.pitch + dy * 0.01)); pdrag = [e.clientX, e.clientY]; turned();
+});
+sc.addEventListener("pointerup", (e) => {
+  if (pdrag && !pmoved) { const r = sc.getBoundingClientRect(); picked = { u: (e.clientX - r.left) / r.width, v: (e.clientY - r.top) / r.height }; renderSight(false); }
+  pdrag = null;
+});
+$("fov").addEventListener("input", () => { drawStars(); renderSight(true); clearTimeout(sightTimer); sightTimer = setTimeout(() => S.cull ? build() : renderSight(false), 250); });
+$("cullOn").onclick = () => { S.cull = true; toggle("cullOn", "cullOff"); build(); };
+$("cullOff").onclick = () => { S.cull = false; toggle("cullOff", "cullOn"); build(); };
+$("toneLog").onclick = () => { S.tone = "log"; toggle("toneLog", "toneReal"); renderSight(false); };
+$("toneReal").onclick = () => { S.tone = "real"; toggle("toneReal", "toneLog"); renderSight(false); };
+$("starsOn").onclick = () => { S.sightStars = !S.sightStars; $("starsOn").classList.toggle("on", S.sightStars); $("starsOn").textContent = S.sightStars ? "별 점 겹치기 켜짐" : "별 점 겹치기 꺼짐"; renderSight(false); };
+$("rangeCube").onclick = () => { S.range = "cube"; toggle("rangeCube", "rangeAll"); renderSight(false); };
+$("rangeAll").onclick = () => { S.range = "all"; toggle("rangeAll", "rangeCube"); renderSight(false); };
+$("whereCube").onclick = () => { S.where = "cube"; toggle("whereCube", "whereMid"); makeStars(); };
+$("whereMid").onclick = () => { S.where = "mid"; toggle("whereMid", "whereCube"); makeStars(); };
+$("placeEven").onclick = () => { S.place = "even"; toggle("placeEven", "placeSmooth"); makeStars(); };
+$("placeSmooth").onclick = () => { S.place = "smooth"; toggle("placeSmooth", "placeEven"); makeStars(); };
+function refill() { FU = fillColumns(views.u, S.fill === "flat"); FW = fillColumns(views.w, S.fill === "flat"); normCache.clear(); rhoCache.clear(); build(); }
+$("fillHill").onclick = () => { S.fill = "hill"; toggle("fillHill", "fillFlat"); refill(); };
+$("fillFlat").onclick = () => { S.fill = "flat"; toggle("fillFlat", "fillHill"); refill(); };
+
+Promise.all([load("y", "@Y@", "@LY@"), load("u", "@U@", "@LU@"), load("w", "@W@", "@LW@")]).then(() => {
+  for (let i = 0; i < N * N; i++) topSum += views.y.light[i];
+  FU = fillColumns(views.u); FW = fillColumns(views.w);
+  // the densest voxel of the galaxy (its middle, at the brightest column's densest height)
+  let best = 0, bi = 0;
+  for (let i = 0; i < N * N; i++) if (views.y.light[i] > best) { best = views.y.light[i]; bi = i; }
+  const br = Math.floor(bi / N), bc = bi % N;
+  for (let h = 0; h < N; h++) peak = Math.max(peak, voxel(bc, br, h).rho);
+  const q = new URLSearchParams(location.search);
+  if (q.get("n")) { S.n = +q.get("n"); SIZES.forEach((m) => $("n" + m).classList.toggle("on", m === S.n)); }
+  if (q.get("at") === "arm") { S.c = Math.round(MC + 8000 * W0 / PC); S.r = Math.round(MR + 8000 * U0 / PC); }
+  if (q.get("dh")) S.h += +q.get("dh");
+  if (q.get("range") === "all") { S.range = "all"; toggle("rangeAll", "rangeCube"); }
+  if (q.get("cull") === "0") { S.cull = false; toggle("cullOff", "cullOn"); }
+  if (q.get("fov")) $("fov").value = q.get("fov");
+  if (q.get("yaw")) S.yaw = +q.get("yaw");
+  if (q.get("pitch")) S.pitch = +q.get("pitch");
+  if (q.get("pick")) { const [u, v] = q.get("pick").split(",").map(Number); picked = { u, v }; }
+  if (q.get("where") === "mid") { S.where = "mid"; toggle("whereMid", "whereCube"); }
+  if (q.get("place") === "smooth") { S.place = "smooth"; toggle("placeSmooth", "placeEven"); }
+  if (q.get("fill") === "flat") { S.fill = "flat"; toggle("fillFlat", "fillHill"); FU = fillColumns(views.u, true); FW = fillColumns(views.w, true); }
+  build();
+  if (q.get("mem")) setTimeout(() => {
+    const m = performance.memory || {};
+    document.title = "MEM " + JSON.stringify({ n: S.n, used: m.usedJSHeapSize, cells: cells.length, visible: visibleCount, stars: stars.length, total: starInfo.total, rhoCache: rhoCache.size, norm: normCache.size });
+  }, 500);
+});
+</script>
+</body>
+</html>

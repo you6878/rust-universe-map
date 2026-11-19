@@ -1,0 +1,31 @@
+{
+ "name": "M58",
+ "size": 1024,
+ "stars": 172306833236.1497,
+ "views": {
+  "y": "M58_xyz_y.png",
+  "x": "M58_xyz_x.png",
+  "z": "M58_xyz_z.png"
+ },
+ "frame": {
+  "kpcPerPx": 0.013422101609300326,
+  "middlePx": {
+   "col": 511.28,
+   "row": 509.28
+  },
+  "wAxis": [
+   0.9405291681375401,
+   -0.33971294335439584
+  ],
+  "uAxis": [
+   0.33971294335439584,
+   0.9405291681375401
+  ],
+  "likePhotograph": 0.9834910852421936
+ },
+ "about": "a galaxy from three views (tools/galaxy_xyz.py), size x size pixels each, kpcPerPx a pixel: y seen from above, rows +U, columns +W; x seen along U, columns +W, rows -Y; z seen along W, columns +U, rows -Y (Y up, out of the disc). In the galaxy's own frame (fitted.json: X its long axis, Z its short one, parsecs from its middle) a place is at W = X wAxis[0] + Z wAxis[1], U = X uAxis[0] + Z uAxis[1], so at column middlePx.col + W / kpcPerPx, row middlePx.row + U / kpcPerPx of the views. Light is sRGB^2.2.",
+ "bulgePx": {
+  "col": 511.5313789046086,
+  "row": 507.8051206865949
+ }
+}
