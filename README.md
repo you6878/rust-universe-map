@@ -2,6 +2,8 @@
 
 **A map of the universe that is computed, not stored.**
 
+**Play it: [Lull Space](https://lull-space.vercel.app)**, a quiet game built on this map. Board a ship with other people and travel the universe together, in your browser.
+
 ![A ship leaving the Milky Way and entering a star of Andromeda](docs/milky-way-to-andromeda.gif)
 
 *Into the Andromeda galaxy and on to one of its stars (29 s, [MP4](docs/milky-way-to-andromeda.mp4)). The points that appear on the way in are Andromeda's stars, computed on the spot.*
@@ -18,8 +20,16 @@
 
 *Arrived at star 1 of Andromeda (`Andromeda Galaxy/1`, 2.54 million light years). The background is not a photograph: it is Andromeda's computed stars, and the blue light on the ship is the light of that B9 star.*
 
-> The ship, the planets' pictures and the third-person camera in these clips belong to a separate game that uses this map.
+> The ship, the planets' pictures and the third-person camera in these clips belong to [Lull Space](https://lull-space.vercel.app), a separate game that uses this map.
 > This repository holds **the map only**. There is no game engine, no renderer and no ship model here.
+
+## The game: Lull Space
+
+**https://lull-space.vercel.app**
+
+Lull Space is a real game made with this map, and a quiet one. There is nothing to fight and nothing to win. You pick a name, board a ring ship with whoever else is there, and go on a group trip through space: to Jupiter, out of the Milky Way, into Andromeda. The stars you pass on the way are the ones this map computes.
+
+It runs in the browser with nothing to install. The first visit downloads the game and its data (about 200 MB), so give it a moment.
 
 ## What this is
 
