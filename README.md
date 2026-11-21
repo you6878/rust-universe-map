@@ -4,9 +4,19 @@
 
 **Play it: [Lull Space](https://lull-space.vercel.app)**, a quiet game built on this map. Board a ship with other people and travel the universe together, in your browser.
 
-![A ship leaving the Milky Way and entering a star of Andromeda](docs/milky-way-to-andromeda.gif)
+![From the bubble of surveyed galaxies to Andromeda, the Milky Way and the Earth](docs/bubble-to-earth.gif)
 
-*Into the Andromeda galaxy and on to one of its stars (29 s, [MP4](docs/milky-way-to-andromeda.mp4)). The points that appear on the way in are Andromeda's stars, computed on the spot.*
+*From 5 billion light years out, where the surveyed galaxies look like a bubble around us, to Andromeda, then into the Milky Way and home to the Earth (1 min, [MP4](docs/bubble-to-earth.mp4)).*
+
+![From the Earth to Andromeda and to the star at its centre](docs/earth-to-andromeda-star.gif)
+
+*From the station over the Earth to the Andromeda galaxy and on to the star at its centre (1 min, [MP4](docs/earth-to-andromeda-star.mp4)). The points that fill the view at the end are Andromeda's stars, computed on the spot.*
+
+![From the station in Earth orbit down to the ground](docs/station-to-ground.gif)
+
+*From the station in Earth orbit down through the air to the ground (1 min, the flight shown about 1.6 times faster, [MP4](docs/station-to-ground.mp4)). The landing site is Anbandegi, a ridge in Gangwon, Korea.*
+
+In all three the camera is behind the ship and looks the way it is going.
 
 ## The game: Lull Space
 
@@ -14,7 +24,7 @@
 
 Lull Space is a real game made with this map, and a quiet one. There is nothing to fight and nothing to win. You pick a name, board a ring ship with whoever else is there, and go on a group trip through space: to Jupiter, out of the Milky Way, into Andromeda. The stars you pass on the way are the ones this map computes.
 
-The clip above was taken in the game. The ship, the camera and everything that draws are the game's and are not in this repository, which holds **the map only**: no game engine, no renderer, no ship model.
+The clips above were taken in the game. The ship, the camera and everything that draws are the game's and are not in this repository, which holds **the map only**: no game engine, no renderer, no ship model.
 
 It runs in the browser with nothing to install. The first visit downloads the game and its data (about 200 MB), so give it a moment.
 
