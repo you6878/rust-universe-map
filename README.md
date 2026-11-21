@@ -8,26 +8,13 @@
 
 *Into the Andromeda galaxy and on to one of its stars (29 s, [MP4](docs/milky-way-to-andromeda.mp4)). The points that appear on the way in are Andromeda's stars, computed on the spot.*
 
-![A ship coming back to the Earth from outside the Milky Way](docs/outside-milky-way-to-earth.gif)
-
-*From outside the Milky Way to the Earth (1 min, [MP4](docs/outside-milky-way-to-earth.mp4)).*
-
-![A ship leaving the Earth for Jupiter](docs/earth-to-jupiter.gif)
-
-*From the Earth to Jupiter (1 min, [MP4](docs/earth-to-jupiter.mp4)). The planets are where they really are on that date (VSOP87).*
-
-![A ship arrived at a star at the centre of Andromeda](docs/arrival-andromeda.jpg)
-
-*Arrived at star 1 of Andromeda (`Andromeda Galaxy/1`, 2.54 million light years). The background is not a photograph: it is Andromeda's computed stars, and the blue light on the ship is the light of that B9 star.*
-
-> The ship, the planets' pictures and the third-person camera in these clips belong to [Lull Space](https://lull-space.vercel.app), a separate game that uses this map.
-> This repository holds **the map only**. There is no game engine, no renderer and no ship model here.
-
 ## The game: Lull Space
 
 **https://lull-space.vercel.app**
 
 Lull Space is a real game made with this map, and a quiet one. There is nothing to fight and nothing to win. You pick a name, board a ring ship with whoever else is there, and go on a group trip through space: to Jupiter, out of the Milky Way, into Andromeda. The stars you pass on the way are the ones this map computes.
+
+The clip above was taken in the game. The ship, the camera and everything that draws are the game's and are not in this repository, which holds **the map only**: no game engine, no renderer, no ship model.
 
 It runs in the browser with nothing to install. The first visit downloads the game and its data (about 200 MB), so give it a moment.
 
