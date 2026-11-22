@@ -2,3 +2,7 @@ target/
 .DS_Store
 __pycache__/
 *.pyc
+
+# the galaxies' photographs (galaxies/fitted.json's ../photos): not distributed here; a game
+# using the map puts them (or a link to them) at map/photos
+map/photos
