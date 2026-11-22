@@ -142,12 +142,6 @@ impl System {
         self.root.stars()
     }
 
-    /// How far from its centre of mass the system reaches, in AU.
-    #[allow(dead_code)]
-    pub fn reach_au(&self) -> f64 {
-        self.root.reach_au()
-    }
-
     /// Where the stars are, in AU from the centre of mass of the system, at a time in years since
     /// J2000. The first is the star the system was made from.
     pub fn places_au(&self, years: f64) -> Vec<(DVec3, Member)> {

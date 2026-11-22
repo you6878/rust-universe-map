@@ -191,11 +191,10 @@ fn light_of(file: &Path, n: usize) -> Result<(Vec<f32>, Vec<[u8; 3]>), String> {
 /// A galaxy's three pictures, read only while they may be wanted: the map has a dozen such
 /// galaxies, each tens of megabytes and a third of a second to read, and only those near the
 /// camera are drawn star by star or as voxels (from afar a galaxy is its photograph). What is known
-/// from its frame file alone (its name, stars, how far its pictures reach) is kept always.
+/// from its frame file alone (its name, how far its pictures reach) is kept always.
 pub struct LazyVolume {
     pub file: std::path::PathBuf,
     pub name: String,
-    pub stars: f64,
     /// How far its pictures reach from its middle (parsecs: along the disc, up), as
     /// `PhotoVolume::reach`.
     pub reach: (f64, f64),
@@ -219,7 +218,6 @@ impl LazyVolume {
         Ok(LazyVolume {
             file: file.to_path_buf(),
             name: v["name"].as_str().unwrap_or("").to_owned(),
-            stars: v["stars"].as_f64().unwrap_or(1e11),
             reach: (h * std::f64::consts::SQRT_2, h),
             slot: Default::default(),
             reading: Default::default(),
